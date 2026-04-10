@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neuroscience and Anatomy Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans Khmer', 'Open Sans', sans-serif;
+        }
+        .quiz-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .option-btn {
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            line-height: 1.6;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .selected {
+            background-color: #e0e7ff !important;
+            border-color: #6366f1 !important;
+            color: #3730a3;
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+        }
+        .incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        .question-nav-btn {
+            transition: all 0.2s ease-in-out;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .question-nav-btn.active {
+            background-color: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+        .question-nav-btn.answered-correct {
+            background-color: #bfdbfe;
+            border-color: #60a5fa;
+            color: #1e40af;
+        }
+        .question-nav-btn.answered-incorrect {
+            background-color: #fecaca;
+            border-color: #f87171;
+            color: #991b1b;
+        }
+        .question-nav-btn:hover:not(.active) {
+            background-color: #f3f4f6;
+        }
+        .edit-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            margin-top: 4px;
+        }
+        .edit-label {
+            font-weight: 500;
+            color: #374151;
+            margin-top: 12px;
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen py-8">
+
+    <div id="quiz-container" class="quiz-container w-full">
+        
+        <div class="text-center mb-8 relative">
+            <h1 class="text-3xl font-bold text-gray-800">Neuroscience and Anatomy</h1>
+            <p id="quiz-subtitle" class="text-gray-500 mt-2">Subject: Comprehensive QCM</p>
+            <div class="absolute top-0 left-0 flex gap-2">
+                <button id="practice-sheet-btn" class="bg-blue-100 text-blue-700 font-semibold py-2 px-4 rounded-lg hover:bg-blue-200 text-sm">Practice Sheet</button>
+                <button id="show-all-btn" class="bg-green-100 text-green-700 font-semibold py-2 px-4 rounded-lg hover:bg-green-200 text-sm">Show Answers</button>
+            </div>
+            <button id="edit-quiz-btn" class="absolute top-0 right-0 bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 text-sm">Edit Quiz</button>
+        </div>
+
+        <div class="text-center mb-6">
+            <div class="inline-flex rounded-md shadow-sm flex-wrap justify-center" role="group">
+                <button id="part1-btn" type="button" class="py-2 px-4 text-sm font-medium text-white bg-indigo-600 rounded-l-lg border border-gray-200 hover:bg-indigo-700 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 1</button>
+                <button id="part2-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 2</button>
+                <button id="part3-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 3</button>
+                <button id="part4-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 4</button>
+                <button id="part5-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 5</button>
+                <button id="part6-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 6</button>
+                <button id="part7-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 7</button>
+                <button id="part8-btn" type="button" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white border-t border-b border-r rounded-r-lg border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">Part 8</button>
+            </div>
+        </div>
+
+        <div id="quiz-view">
+            <div class="flex justify-between items-center mb-4">
+                 <div id="main-score-text" class="text-lg font-bold text-indigo-600"></div>
+                 <button id="redo-part-btn" class="bg-orange-100 text-orange-700 font-semibold py-2 px-4 rounded-lg hover:bg-orange-200 text-sm">Redo Part</button>
+            </div>
+            <div id="question-navigation" class="flex flex-wrap justify-center gap-2 mb-6"></div>
+
+            <div id="question-area" class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="question-number" class="text-xl font-semibold text-gray-700"></h2>
+                </div>
+                <div id="question-text" class="text-lg text-gray-800 leading-relaxed font-medium"></div>
+            </div>
+
+            <div id="answer-area"></div>
+            <div id="feedback-area" class="mt-6 text-center text-lg font-medium"></div>
+
+            <div class="mt-6 text-center">
+                <button id="redo-btn" class="hidden bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-yellow-600 transition-colors duration-300 shadow-lg">
+                    Redo Question
+                </button>
+            </div>
+
+            <div class="mt-4 flex justify-between items-center">
+                <button id="prev-btn" class="bg-gray-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-600 transition-colors duration-300 shadow-lg hidden">
+                    <span class="font-semibold">&larr; Previous</span>
+                </button>
+                <button id="next-btn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-lg hidden ml-auto">
+                    <span class="font-semibold">Next Question</span>
+                </button>
+            </div>
+
+            <div id="results-area" class="hidden text-center">
+                <div class="mb-4">
+                    <h2 class="text-4xl font-extrabold text-gray-800">Quiz Complete!</h2>
+                </div>
+                <p id="results-score" class="text-2xl text-gray-600 mb-6"></p>
+                <div id="summary" class="text-left mt-8 bg-gray-50 p-6 rounded-lg">
+                    <div class="text-center">
+                        <h3 class="text-xl font-bold text-gray-700">Review Your Answers:</h3>
+                    </div>
+                </div>
+                <button id="restart-btn" class="mt-8 bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-lg">
+                    <span class="font-semibold">Play Again</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="practice-sheet-view" class="hidden"></div>
+        <div id="all-questions-view" class="hidden"></div>
+
+        <div id="edit-view" class="hidden">
+            <h2 class="text-2xl font-bold text-center mb-6">Edit Quiz Questions</h2>
+            <div id="edit-question-navigation" class="flex flex-wrap justify-center gap-2 mb-6"></div>
+            <div id="edit-questions-container"></div>
+            <div class="flex justify-between items-start mt-8">
+                <button id="add-question-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700">Add Question</button>
+                <div>
+                    <button id="cancel-edit-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 mr-4">Cancel</button>
+                    <button id="apply-preview-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700">Apply to Preview</button>
+                    <button id="generate-save-code-btn" class="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-700 ml-4">Generate Save Code</button>
+                </div>
+            </div>
+            <div id="export-area" class="hidden mt-6 p-4 border-2 border-dashed border-purple-400 rounded-lg bg-purple-50">
+                <h3 class="text-lg font-semibold text-purple-800">How to Save Your Changes Permanently</h3>
+                <ol class="list-decimal list-inside text-gray-700 space-y-2 mt-2">
+                    <li>All the code for your updated quiz is in the text box below.</li>
+                    <li>Click anywhere in the box to automatically copy all the code.</li>
+                    <li>Paste the copied code in a new message and send it to me.</li>
+                    <li>I will then update the file for you with your permanent changes.</li>
+                </ol>
+                <textarea id="export-output" readonly class="w-full h-64 p-2 border rounded-md bg-gray-100 font-mono text-sm focus:ring-2 focus:ring-indigo-500 mt-4 cursor-pointer"></textarea>
+                <p id="copy-feedback" class="text-purple-700 font-medium text-sm mt-2 h-4"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        let quizDataPart1 = [
+            { number: 1, type: "mcq", question: { en: "1. Which cranial nerve is responsible for the sense of smell and consists of fibers that pass through the cribriform plate of the ethmoid bone?" }, options: { en: ["A. Optic nerve", "B. Olfactory nerve", "C. Trigeminal nerve", "D. Facial nerve"] }, answer: { en: ["B. Olfactory nerve"] } },
+            { number: 2, type: "mcq", question: { en: "2. Which cranial nerve is responsible for vision and transmits impulses from the retina to the brain?" }, options: { en: ["A. Olfactory nerve", "B. Optic nerve", "C. Oculomotor nerve", "D. Trochlear nerve"] }, answer: { en: ["B. Optic nerve"] } },
+            { number: 3, type: "mcq", question: { en: "3. Which cranial nerve controls most of the extraocular muscles and carries parasympathetic fibers for pupillary constriction?" }, options: { en: ["A. Trochlear nerve", "B. Abducens nerve", "C. Oculomotor nerve", "D. Optic nerve"] }, answer: { en: ["C. Oculomotor nerve"] } },
+            { number: 4, type: "mcq", question: { en: "4. Which cranial nerve innervates the superior oblique muscle of the eye?" }, options: { en: ["A. Oculomotor nerve", "B. Trochlear nerve", "C. Abducens nerve", "D. Facial nerve"] }, answer: { en: ["B. Trochlear nerve"] } },
+            { number: 5, type: "mcq", question: { en: "5. Which cranial nerve innervates the lateral rectus muscle and is responsible for abduction of the eye?" }, options: { en: ["A. Oculomotor", "B. Trochlear", "C. Abducens", "D. Trigeminal"] }, answer: { en: ["C. Abducens"] } },
+            { number: 6, type: "mcq", question: { en: "6. Which cranial nerve is the largest and has both sensory and motor components, supplying the face and muscles of mastication?" }, options: { en: ["A. Facial nerve", "B. Trigeminal nerve", "C. Glossopharyngeal nerve", "D. Vagus nerve"] }, answer: { en: ["B. Trigeminal nerve"] } },
+            { number: 7, type: "mcq", question: { en: "7. Which cranial nerve provides motor innervation to muscles of facial expression and carries taste sensation from the anterior two-thirds of the tongue?" }, options: { en: ["A. Trigeminal", "B. Facial", "C. Glossopharyngeal", "D. Hypoglossal"] }, answer: { en: ["B. Facial"] } },
+            { number: 8, type: "mcq", question: { en: "8. Which cranial nerve is responsible for hearing and balance?" }, options: { en: ["A. Facial nerve", "B. Vestibulocochlear nerve", "C. Vagus nerve", "D. Accessory nerve"] }, answer: { en: ["B. Vestibulocochlear nerve"] } },
+            { number: 9, type: "mcq", question: { en: "9. Which cranial nerve carries taste from the posterior one-third of the tongue and contributes to swallowing?" }, options: { en: ["A. Facial", "B. Glossopharyngeal", "C. Vagus", "D. Hypoglossal"] }, answer: { en: ["B. Glossopharyngeal"] } },
+            { number: 10, type: "mcq", question: { en: "10. Which cranial nerve has the most extensive distribution and innervates thoracic and abdominal viscera?" }, options: { en: ["A. Glossopharyngeal", "B. Vagus", "C. Hypoglossal", "D. Accessory"] }, answer: { en: ["B. Vagus"] } },
+            { number: 11, type: "mcq", question: { en: "11. Which cranial nerve primarily controls movements of the tongue?" }, options: { en: ["A. Facial", "B. Glossopharyngeal", "C. Hypoglossal", "D. Vagus"] }, answer: { en: ["C. Hypoglossal"] } },
+            { number: 12, type: "mcq", question: { en: "12. Which cranial nerve innervates the sternocleidomastoid and trapezius muscles?" }, options: { en: ["A. Facial", "B. Vagus", "C. Accessory", "D. Hypoglossal"] }, answer: { en: ["C. Accessory"] } },
+            { number: 13, type: "mcq", question: { en: "13. Which cranial nerve is purely sensory?" }, options: { en: ["A. Trigeminal", "B. Facial", "C. Olfactory", "D. Vagus"] }, answer: { en: ["C. Olfactory"] } },
+            { number: 14, type: "mcq", question: { en: "14. Which cranial nerve is purely motor?" }, options: { en: ["A. Trigeminal", "B. Facial", "C. Hypoglossal", "D. Glossopharyngeal"] }, answer: { en: ["C. Hypoglossal"] } },
+            { number: 15, type: "mcq", question: { en: "15. Which cranial nerve has four nuclei and both motor and sensory components, including parasympathetic fibers?" }, options: { en: ["A. Facial nerve", "B. Trigeminal nerve", "C. Vagus nerve", "D. Glossopharyngeal nerve"] }, answer: { en: ["B. Trigeminal nerve"] } },
+            { number: 16, type: "mcq", question: { en: "16. Which cranial nerve is responsible for corneal reflex (sensory limb)?" }, options: { en: ["A. Facial", "B. Trigeminal", "C. Vagus", "D. Optic"] }, answer: { en: ["B. Trigeminal"] } },
+            { number: 17, type: "mcq", question: { en: "17. Which cranial nerve is responsible for corneal reflex (motor limb)?" }, options: { en: ["A. Trigeminal", "B. Facial", "C. Oculomotor", "D. Abducens"] }, answer: { en: ["B. Facial"] } },
+            { number: 18, type: "mcq", question: { en: "18. Which cranial nerve is involved in the gag reflex (sensory limb)?" }, options: { en: ["A. Facial", "B. Glossopharyngeal", "C. Vagus", "D. Hypoglossal"] }, answer: { en: ["B. Glossopharyngeal"] } },
+            { number: 19, type: "mcq", question: { en: "19. Which cranial nerve is involved in the gag reflex (motor limb)?" }, options: { en: ["A. Glossopharyngeal", "B. Vagus", "C. Hypoglossal", "D. Facial"] }, answer: { en: ["B. Vagus"] } },
+            { number: 20, type: "mcq", question: { en: "20. Which cranial nerve lesion leads to loss of forehead wrinkling and inability to close the eye?" }, options: { en: ["A. Trigeminal", "B. Facial", "C. Hypoglossal", "D. Vagus"] }, answer: { en: ["B. Facial"] } },
+            { number: 21, type: "mcq", question: { en: "21. Which cranial nerve lesion leads to diplopia due to inability to abduct the eye?" }, options: { en: ["A. Oculomotor", "B. Trochlear", "C. Abducens", "D. Optic"] }, answer: { en: ["C. Abducens"] } },
+            { number: 22, type: "mcq", question: { en: "22. Which cranial nerve lesion leads to tongue deviation toward the side of lesion?" }, options: { en: ["A. Facial", "B. Glossopharyngeal", "C. Hypoglossal", "D. Vagus"] }, answer: { en: ["C. Hypoglossal"] } },
+            { number: 23, type: "mcq", question: { en: "23. Which cranial nerve passes through the jugular foramen along with CN X and XI?" }, options: { en: ["A. Facial", "B. Glossopharyngeal", "C. Trigeminal", "D. Hypoglossal"] }, answer: { en: ["B. Glossopharyngeal"] } },
+            { number: 24, type: "mcq", question: { en: "24. Which cranial nerve exits the skull via the optic canal?" }, options: { en: ["A. Olfactory", "B. Optic", "C. Oculomotor", "D. Trochlear"] }, answer: { en: ["B. Optic"] } },
+            { number: 25, type: "mcq", question: { en: "25. Which cranial nerve passes through the superior orbital fissure?" }, options: { en: ["A. Optic", "B. Oculomotor", "C. Olfactory", "D. Hypoglossal"] }, answer: { en: ["B. Oculomotor"] } },
+            { number: 26, type: "mcq", question: { en: "26. Which cranial nerve has the longest intracranial course and is most susceptible to injury?" }, options: { en: ["A. Facial", "B. Trochlear", "C. Abducens", "D. Vagus"] }, answer: { en: ["C. Abducens"] } },
+            { number: 27, type: "mcq", question: { en: "27. Which cranial nerve is responsible for parasympathetic innervation of salivary glands via the otic ganglion?" }, options: { en: ["A. Facial", "B. Glossopharyngeal", "C. Vagus", "D. Trigeminal"] }, answer: { en: ["B. Glossopharyngeal"] } },
+            { number: 28, type: "mcq", question: { en: "28. Which cranial nerve provides parasympathetic innervation to lacrimal gland?" }, options: { en: ["A. Trigeminal", "B. Facial", "C. Glossopharyngeal", "D. Vagus"] }, answer: { en: ["B. Facial"] } },
+            { number: 29, type: "mcq", question: { en: "29. Which cranial nerve is involved in pupillary light reflex (afferent limb)?" }, options: { en: ["A. Oculomotor", "B. Optic", "C. Trigeminal", "D. Facial"] }, answer: { en: ["B. Optic"] } },
+            { number: 30, type: "mcq", question: { en: "30. Which cranial nerve is involved in pupillary light reflex (efferent limb)?" }, options: { en: ["A. Optic", "B. Oculomotor", "C. Trochlear", "D. Abducens"] }, answer: { en: ["B. Oculomotor"] } }
+        ];
+
+        let quizDataPart2 = [
+            { number: 1, type: "mcq", question: { en: "1. The nervous system is classically divided into major functional components based on its role in processing and responding to stimuli. Which division is primarily responsible for detecting internal and external stimuli and transmitting this information to the central nervous system?" }, options: { en: ["A. Motor (efferent) system", "B. Sensory (afferent) system", "C. Autonomic system", "D. Somatic system"] }, answer: { en: ["B. Sensory (afferent) system"] } },
+            { number: 2, type: "mcq", question: { en: "2. Which functional division of the nervous system is responsible for transmitting commands from the central nervous system to skeletal muscles for voluntary movement?" }, options: { en: ["A. Sensory system", "B. Autonomic system", "C. Somatic motor system", "D. Limbic system"] }, answer: { en: ["C. Somatic motor system"] } },
+            { number: 3, type: "mcq", question: { en: "3. The autonomic nervous system regulates involuntary physiological processes. Which of the following is a primary function of this system?" }, options: { en: ["A. Conscious movement", "B. Voluntary muscle control", "C. Regulation of heart rate and digestion", "D. Visual perception"] }, answer: { en: ["C. Regulation of heart rate and digestion"] } },
+            { number: 4, type: "mcq", question: { en: "4. Which subdivision of the autonomic nervous system is primarily associated with “fight or flight” responses?" }, options: { en: ["A. Parasympathetic", "B. Somatic", "C. Sympathetic", "D. Enteric"] }, answer: { en: ["C. Sympathetic"] } },
+            { number: 5, type: "mcq", question: { en: "5. Which subdivision of the autonomic nervous system is responsible for “rest and digest” functions?" }, options: { en: ["A. Sympathetic", "B. Parasympathetic", "C. Somatic", "D. Central"] }, answer: { en: ["B. Parasympathetic"] } },
+            { number: 6, type: "mcq", question: { en: "6. The nervous system integrates sensory input to produce appropriate responses. Which structure is primarily responsible for higher-level integration, cognition, and decision-making?" }, options: { en: ["A. Brainstem", "B. Spinal cord", "C. Cerebrum", "D. Cerebellum"] }, answer: { en: ["C. Cerebrum"] } },
+            { number: 7, type: "mcq", question: { en: "7. Which part of the nervous system is responsible for coordinating voluntary movements and maintaining balance and posture?" }, options: { en: ["A. Cerebrum", "B. Cerebellum", "C. Brainstem", "D. Thalamus"] }, answer: { en: ["B. Cerebellum"] } },
+            { number: 8, type: "mcq", question: { en: "8. Which structure is primarily responsible for maintaining vital functions such as respiration and cardiovascular regulation?" }, options: { en: ["A. Cerebellum", "B. Brainstem", "C. Cerebrum", "D. Limbic system"] }, answer: { en: ["B. Brainstem"] } },
+            { number: 9, type: "mcq", question: { en: "9. Which functional component of the nervous system is responsible for rapid, automatic responses to stimuli without conscious thought?" }, options: { en: ["A. Voluntary motor system", "B. Reflex arc", "C. Limbic system", "D. Cerebral cortex"] }, answer: { en: ["B. Reflex arc"] } },
+            { number: 10, type: "mcq", question: { en: "10. Which function of the nervous system involves processing and interpreting sensory input to generate perception?" }, options: { en: ["A. Sensory input", "B. Motor output", "C. Integration", "D. Reflex"] }, answer: { en: ["C. Integration"] } },
+            { number: 11, type: "mcq", question: { en: "11. Which type of neurons carry impulses from sensory receptors toward the central nervous system?" }, options: { en: ["A. Motor neurons", "B. Interneurons", "C. Sensory (afferent) neurons", "D. Autonomic neurons"] }, answer: { en: ["C. Sensory (afferent) neurons"] } },
+            { number: 12, type: "mcq", question: { en: "12. Which type of neurons transmit signals from the central nervous system to muscles and glands?" }, options: { en: ["A. Sensory neurons", "B. Motor (efferent) neurons", "C. Interneurons", "D. Association neurons"] }, answer: { en: ["B. Motor (efferent) neurons"] } },
+            { number: 13, type: "mcq", question: { en: "13. Which system is primarily responsible for emotional processing, memory, and behavioral responses?" }, options: { en: ["A. Somatic system", "B. Autonomic system", "C. Limbic system", "D. Sensory system"] }, answer: { en: ["C. Limbic system"] } },
+            { number: 14, type: "mcq", question: { en: "14. Which part of the nervous system allows conscious awareness of sensory stimuli?" }, options: { en: ["A. Spinal cord", "B. Brainstem", "C. Cerebral cortex", "D. Cerebellum"] }, answer: { en: ["C. Cerebral cortex"] } },
+            { number: 15, type: "mcq", question: { en: "15. Which functional division of the nervous system controls smooth muscle, cardiac muscle, and glandular activity?" }, options: { en: ["A. Somatic", "B. Sensory", "C. Autonomic", "D. Motor"] }, answer: { en: ["C. Autonomic"] } },
+            { number: 16, type: "mcq", question: { en: "16. Which system within the nervous system is specifically adapted to regulate gastrointestinal function independently?" }, options: { en: ["A. Sympathetic", "B. Parasympathetic", "C. Enteric", "D. Somatic"] }, answer: { en: ["C. Enteric"] } },
+            { number: 17, type: "mcq", question: { en: "17. Which function of the nervous system involves generating a response after processing sensory input?" }, options: { en: ["A. Sensory input", "B. Integration", "C. Motor output", "D. Reflex"] }, answer: { en: ["C. Motor output"] } },
+            { number: 18, type: "mcq", question: { en: "18. Which component of the nervous system is responsible for linking sensory and motor pathways within the central nervous system?" }, options: { en: ["A. Motor neurons", "B. Sensory neurons", "C. Interneurons", "D. Autonomic neurons"] }, answer: { en: ["C. Interneurons"] } },
+            { number: 19, type: "mcq", question: { en: "19. Which system ensures rapid transmission of signals for voluntary movement and reflex actions?" }, options: { en: ["A. Endocrine system", "B. Nervous system", "C. Circulatory system", "D. Respiratory system"] }, answer: { en: ["B. Nervous system"] } },
+            { number: 20, type: "mcq", question: { en: "20. Which functional property of the nervous system allows it to detect changes in the environment and initiate responses?" }, options: { en: ["A. Plasticity", "B. Excitability", "C. Inhibition", "D. Adaptation"] }, answer: { en: ["B. Excitability"] } },
+            { number: 21, type: "mcq", question: { en: "21. The central nervous system is composed of two main anatomical structures responsible for integration and control of body functions. Which structures constitute the CNS?" }, options: { en: ["A. Brain and peripheral nerves", "B. Brain and spinal cord", "C. Spinal cord and ganglia", "D. Brainstem and cerebellum"] }, answer: { en: ["B. Brain and spinal cord"] } },
+            { number: 22, type: "mcq", question: { en: "22. Which component of the CNS is primarily responsible for higher cognitive functions such as reasoning, planning, and voluntary control of movement?" }, options: { en: ["A. Cerebellum", "B. Brainstem", "C. Cerebrum", "D. Spinal cord"] }, answer: { en: ["C. Cerebrum"] } },
+            { number: 23, type: "mcq", question: { en: "23. Which part of the CNS is responsible for coordinating movement, balance, and posture?" }, options: { en: ["A. Cerebrum", "B. Brainstem", "C. Cerebellum", "D. Thalamus"] }, answer: { en: ["C. Cerebellum"] } },
+            { number: 24, type: "mcq", question: { en: "24. Which CNS structure is responsible for basic life-sustaining functions such as respiration and heart rate?" }, options: { en: ["A. Cerebellum", "B. Brainstem", "C. Cerebrum", "D. Spinal cord"] }, answer: { en: ["B. Brainstem"] } },
+            { number: 25, type: "mcq", question: { en: "25. The spinal cord is a component of the CNS that primarily functions in conduction and reflexes. Which function best describes its role?" }, options: { en: ["A. Hormonal regulation", "B. Reflex activity and signal conduction", "C. Memory processing", "D. Visual perception"] }, answer: { en: ["B. Reflex activity and signal conduction"] } },
+            { number: 26, type: "mcq", question: { en: "26. Which part of the CNS serves as a relay center for sensory information before it reaches the cortex?" }, options: { en: ["A. Hypothalamus", "B. Thalamus", "C. Cerebellum", "D. Brainstem"] }, answer: { en: ["B. Thalamus"] } },
+            { number: 27, type: "mcq", question: { en: "27. Which CNS structure is involved in maintaining homeostasis and regulating endocrine functions?" }, options: { en: ["A. Thalamus", "B. Hypothalamus", "C. Cerebellum", "D. Pons"] }, answer: { en: ["B. Hypothalamus"] } },
+            { number: 28, type: "mcq", question: { en: "28. Which type of tissue in the CNS contains neuron cell bodies and is responsible for processing information?" }, options: { en: ["A. White matter", "B. Gray matter", "C. CSF", "D. Pia mater"] }, answer: { en: ["B. Gray matter"] } },
+            { number: 29, type: "mcq", question: { en: "29. Which type of CNS tissue is primarily composed of myelinated axons responsible for signal transmission?" }, options: { en: ["A. Gray matter", "B. White matter", "C. Dura mater", "D. Ventricular system"] }, answer: { en: ["B. White matter"] } },
+            { number: 30, type: "mcq", question: { en: "30. Which protective covering of the CNS is the outermost and toughest?" }, options: { en: ["A. Pia mater", "B. Arachnoid mater", "C. Dura mater", "D. Subarachnoid space"] }, answer: { en: ["C. Dura mater"] } },
+            { number: 31, type: "mcq", question: { en: "31. Which space within the CNS contains cerebrospinal fluid that cushions and protects neural tissue?" }, options: { en: ["A. Epidural space", "B. Subdural space", "C. Subarachnoid space", "D. Intracellular space"] }, answer: { en: ["C. Subarachnoid space"] } },
+            { number: 32, type: "mcq", question: { en: "32. Which structure produces cerebrospinal fluid within the CNS?" }, options: { en: ["A. Arachnoid villi", "B. Choroid plexus", "C. Pia mater", "D. Dura mater"] }, answer: { en: ["B. Choroid plexus"] } },
+            { number: 33, type: "mcq", question: { en: "33. Which structure reabsorbs cerebrospinal fluid into the venous system?" }, options: { en: ["A. Choroid plexus", "B. Arachnoid granulations", "C. Cerebral aqueduct", "D. Ventricles"] }, answer: { en: ["B. Arachnoid granulations"] } },
+            { number: 34, type: "mcq", question: { en: "34. Which CNS component is responsible for conscious awareness of sensory input?" }, options: { en: ["A. Spinal cord", "B. Brainstem", "C. Cerebral cortex", "D. Cerebellum"] }, answer: { en: ["C. Cerebral cortex"] } },
+            { number: 35, type: "mcq", question: { en: "35. Which CNS structure contains ascending and descending tracts responsible for transmitting signals between brain and body?" }, options: { en: ["A. Cerebellum", "B. Spinal cord", "C. Hypothalamus", "D. Thalamus"] }, answer: { en: ["B. Spinal cord"] } },
+            { number: 36, type: "mcq", question: { en: "36. Which part of the CNS is involved in emotional processing and memory?" }, options: { en: ["A. Brainstem", "B. Limbic system", "C. Cerebellum", "D. Spinal cord"] }, answer: { en: ["B. Limbic system"] } },
+            { number: 37, type: "mcq", question: { en: "37. Which structure connects the two cerebral hemispheres within the CNS?" }, options: { en: ["A. Internal capsule", "B. Corpus callosum", "C. Brainstem", "D. Thalamus"] }, answer: { en: ["B. Corpus callosum"] } },
+            { number: 38, type: "mcq", question: { en: "38. Which functional system within the CNS regulates involuntary functions such as heart rate and digestion?" }, options: { en: ["A. Somatic system", "B. Autonomic system", "C. Sensory system", "D. Motor cortex"] }, answer: { en: ["B. Autonomic system"] } },
+            { number: 39, type: "mcq", question: { en: "39. Which CNS region is responsible for coordination of fine voluntary movements?" }, options: { en: ["A. Brainstem", "B. Cerebellum", "C. Thalamus", "D. Hypothalamus"] }, answer: { en: ["B. Cerebellum"] } },
+            { number: 40, type: "mcq", question: { en: "40. Which structure within the CNS is most involved in relaying motor signals from the cerebellum and basal ganglia to the cortex?" }, options: { en: ["A. Hypothalamus", "B. Thalamus", "C. Medulla", "D. Pons"] }, answer: { en: ["B. Thalamus"] } },
+            { number: 41, type: "mcq", question: { en: "41. Which CNS structure is most vulnerable to ischemia due to high metabolic demand?" }, options: { en: ["A. Cerebellum", "B. Hippocampus", "C. Pons", "D. Medulla"] }, answer: { en: ["B. Hippocampus"] } },
+            { number: 42, type: "mcq", question: { en: "42. Which CNS structure is primarily responsible for initiating voluntary motor activity?" }, options: { en: ["A. Cerebellum", "B. Precentral gyrus", "C. Postcentral gyrus", "D. Thalamus"] }, answer: { en: ["B. Precentral gyrus"] } },
+            { number: 43, type: "mcq", question: { en: "43. Which CNS region processes somatosensory information?" }, options: { en: ["A. Frontal lobe", "B. Parietal lobe", "C. Temporal lobe", "D. Occipital lobe"] }, answer: { en: ["B. Parietal lobe"] } },
+            { number: 44, type: "mcq", question: { en: "44. Which CNS region is primarily responsible for visual processing?" }, options: { en: ["A. Frontal lobe", "B. Temporal lobe", "C. Parietal lobe", "D. Occipital lobe"] }, answer: { en: ["D. Occipital lobe"] } },
+            { number: 45, type: "mcq", question: { en: "45. Which CNS region is responsible for auditory processing?" }, options: { en: ["A. Frontal lobe", "B. Temporal lobe", "C. Parietal lobe", "D. Occipital lobe"] }, answer: { en: ["B. Temporal lobe"] } },
+            { number: 46, type: "mcq", question: { en: "46. Which CNS structure is responsible for maintaining posture and equilibrium?" }, options: { en: ["A. Cerebrum", "B. Cerebellum", "C. Thalamus", "D. Brainstem"] }, answer: { en: ["B. Cerebellum"] } },
+            { number: 47, type: "mcq", question: { en: "47. Which CNS structure connects the brain to the spinal cord?" }, options: { en: ["A. Cerebellum", "B. Brainstem", "C. Thalamus", "D. Hypothalamus"] }, answer: { en: ["B. Brainstem"] } },
+            { number: 48, type: "mcq", question: { en: "48. Which CNS structure contains cranial nerve nuclei?" }, options: { en: ["A. Cerebrum", "B. Cerebellum", "C. Brainstem", "D. Spinal cord"] }, answer: { en: ["C. Brainstem"] } },
+            { number: 49, type: "mcq", question: { en: "49. Which CNS structure is involved in circadian rhythm regulation?" }, options: { en: ["A. Thalamus", "B. Hypothalamus", "C. Cerebellum", "D. Medulla"] }, answer: { en: ["B. Hypothalamus"] } },
+            { number: 50, type: "mcq", question: { en: "50. Which CNS structure is responsible for integrating sensory input and producing motor output?" }, options: { en: ["A. Cerebellum", "B. Spinal cord", "C. Brainstem", "D. Entire CNS"] }, answer: { en: ["D. Entire CNS"] } }
+        ];
+
+        let quizDataPart3 = [
+            { number: 51, type: "mcq", question: { en: "51. In the peripheral nervous system, myelination differs from that in the central nervous system in both structure and cellular origin. Which statement best describes this difference?" }, options: { en: ["A. Myelin is produced by oligodendrocytes and covers one axon segment", "B. Schwann cells myelinate multiple axons simultaneously", "C. Each Schwann cell myelinate a single segment of one axon", "D. Myelin is absent in the peripheral nervous system"] }, answer: { en: ["C. Each Schwann cell myelinate a single segment of one axon"] } },
+            { number: 52, type: "mcq", question: { en: "52. Which functional division of the PNS is responsible for transmitting sensory information from receptors to the CNS?" }, options: { en: ["A. Somatic motor", "B. Autonomic motor", "C. Sensory (afferent) division", "D. Enteric division"] }, answer: { en: ["C. Sensory (afferent) division"] } },
+            { number: 53, type: "mcq", question: { en: "53. Which division of the PNS is responsible for voluntary control of skeletal muscles?" }, options: { en: ["A. Autonomic nervous system", "B. Somatic nervous system", "C. Enteric nervous system", "D. Sensory system"] }, answer: { en: ["B. Somatic nervous system"] } },
+            { number: 54, type: "mcq", question: { en: "54. The autonomic nervous system is a subdivision of the PNS. Which of the following is a primary function of this system?" }, options: { en: ["A. Conscious movement", "B. Processing visual input", "C. Regulation of involuntary functions", "D. Language comprehension"] }, answer: { en: ["C. Regulation of involuntary functions"] } },
+            { number: 55, type: "mcq", question: { en: "55. Which subdivision of the autonomic nervous system is associated with “fight or flight” responses?" }, options: { en: ["A. Parasympathetic", "B. Sympathetic", "C. Enteric", "D. Somatic"] }, answer: { en: ["B. Sympathetic"] } },
+            { number: 56, type: "mcq", question: { en: "56. Which subdivision of the autonomic nervous system is associated with “rest and digest” functions?" }, options: { en: ["A. Sympathetic", "B. Parasympathetic", "C. Somatic", "D. Sensory"] }, answer: { en: ["B. Parasympathetic"] } },
+            { number: 57, type: "mcq", question: { en: "57. Which component of the PNS is specifically adapted to regulate gastrointestinal activity independently of the CNS?" }, options: { en: ["A. Somatic system", "B. Sympathetic system", "C. Enteric nervous system", "D. Sensory system"] }, answer: { en: ["C. Enteric nervous system"] } },
+            { number: 58, type: "mcq", question: { en: "58. Cranial nerves are part of the PNS. How many pairs of cranial nerves are present in humans?" }, options: { en: ["A. 10", "B. 11", "C. 12", "D. 13"] }, answer: { en: ["C. 12"] } },
+            { number: 59, type: "mcq", question: { en: "59. Spinal nerves emerge from the spinal cord. How many pairs of spinal nerves are present?" }, options: { en: ["A. 12", "B. 24", "C. 31", "D. 33"] }, answer: { en: ["C. 31"] } },
+            { number: 60, type: "mcq", question: { en: "60. Each spinal nerve is formed by the union of which two roots?" }, options: { en: ["A. Motor and autonomic", "B. Dorsal and ventral roots", "C. Sensory and autonomic", "D. Cranial and spinal roots"] }, answer: { en: ["B. Dorsal and ventral roots"] } },
+            { number: 61, type: "mcq", question: { en: "61. Which root of the spinal nerve carries sensory fibers into the spinal cord?" }, options: { en: ["A. Ventral root", "B. Dorsal root", "C. Mixed root", "D. Autonomic root"] }, answer: { en: ["B. Dorsal root"] } },
+            { number: 62, type: "mcq", question: { en: "62. Which root of the spinal nerve carries motor fibers out of the spinal cord?" }, options: { en: ["A. Dorsal root", "B. Ventral root", "C. Sensory root", "D. Mixed root"] }, answer: { en: ["B. Ventral root"] } },
+            { number: 63, type: "mcq", question: { en: "63. Where are the cell bodies of sensory neurons located in the PNS?" }, options: { en: ["A. Anterior horn", "B. Posterior horn", "C. Dorsal root ganglion", "D. Lateral horn"] }, answer: { en: ["C. Dorsal root ganglion"] } },
+            { number: 64, type: "mcq", question: { en: "64. Which type of neuron transmits impulses from the CNS to muscles and glands?" }, options: { en: ["A. Sensory neuron", "B. Motor neuron", "C. Interneuron", "D. Association neuron"] }, answer: { en: ["B. Motor neuron"] } },
+            { number: 65, type: "mcq", question: { en: "65. Which type of neuron carries impulses from sensory receptors toward the CNS?" }, options: { en: ["A. Motor neuron", "B. Sensory neuron", "C. Interneuron", "D. Autonomic neuron"] }, answer: { en: ["B. Sensory neuron"] } },
+            { number: 66, type: "mcq", question: { en: "66. Which part of the PNS is responsible for reflex actions at the level of the spinal cord?" }, options: { en: ["A. Cranial nerves", "B. Spinal nerves", "C. Brainstem", "D. Cerebellum"] }, answer: { en: ["B. Spinal nerves"] } },
+            { number: 67, type: "mcq", question: { en: "67. Which connective tissue layer surrounds individual nerve fibers?" }, options: { en: ["A. Epineurium", "B. Perineurium", "C. Endoneurium", "D. Dura mater"] }, answer: { en: ["C. Endoneurium"] } },
+            { number: 68, type: "mcq", question: { en: "68. Which connective tissue layer surrounds bundles (fascicles) of nerve fibers?" }, options: { en: ["A. Epineurium", "B. Perineurium", "C. Endoneurium", "D. Pia mater"] }, answer: { en: ["B. Perineurium"] } },
+            { number: 69, type: "mcq", question: { en: "69. Which connective tissue layer surrounds the entire nerve?" }, options: { en: ["A. Endoneurium", "B. Perineurium", "C. Epineurium", "D. Arachnoid"] }, answer: { en: ["C. Epineurium"] } },
+            { number: 70, type: "mcq", question: { en: "70. Which cells are responsible for myelination in the PNS?" }, options: { en: ["A. Oligodendrocytes", "B. Astrocytes", "C. Schwann cells", "D. Microglia"] }, answer: { en: ["C. Schwann cells"] } },
+            { number: 71, type: "mcq", question: { en: "71. Which structure is formed by the branching of spinal nerves to supply specific regions of the body?" }, options: { en: ["A. Ganglion", "B. Plexus", "C. Nucleus", "D. Tract"] }, answer: { en: ["B. Plexus"] } },
+            { number: 72, type: "mcq", question: { en: "72. Which plexus supplies the upper limb?" }, options: { en: ["A. Lumbar plexus", "B. Sacral plexus", "C. Cervical plexus", "D. Brachial plexus"] }, answer: { en: ["D. Brachial plexus"] } },
+            { number: 73, type: "mcq", question: { en: "73. Which plexus supplies the lower limb?" }, options: { en: ["A. Cervical plexus", "B. Brachial plexus", "C. Lumbar and sacral plexuses", "D. Thoracic plexus"] }, answer: { en: ["C. Lumbar and sacral plexuses"] } },
+            { number: 74, type: "mcq", question: { en: "74. Which nerves are NOT part of a plexus and run directly as intercostal nerves?" }, options: { en: ["A. Cervical nerves", "B. Thoracic nerves", "C. Lumbar nerves", "D. Sacral nerves"] }, answer: { en: ["B. Thoracic nerves"] } },
+            { number: 75, type: "mcq", question: { en: "75. Which functional component of the PNS controls skeletal muscle activity?" }, options: { en: ["A. Autonomic system", "B. Somatic motor system", "C. Sensory system", "D. Enteric system"] }, answer: { en: ["B. Somatic motor system"] } },
+            { number: 76, type: "mcq", question: { en: "76. Which system controls smooth muscle, cardiac muscle, and glandular secretion?" }, options: { en: ["A. Somatic", "B. Sensory", "C. Autonomic", "D. Motor cortex"] }, answer: { en: ["C. Autonomic"] } },
+            { number: 77, type: "mcq", question: { en: "77. Which type of ganglia are associated with the autonomic nervous system?" }, options: { en: ["A. Sensory ganglia only", "B. Motor ganglia", "C. Autonomic ganglia", "D. Spinal ganglia only"] }, answer: { en: ["C. Autonomic ganglia"] } },
+            { number: 78, type: "mcq", question: { en: "78. Which functional property allows PNS neurons to respond to stimuli?" }, options: { en: ["A. Conductivity", "B. Excitability", "C. Plasticity", "D. Adaptation"] }, answer: { en: ["B. Excitability"] } },
+            { number: 79, type: "mcq", question: { en: "79. Which property allows nerve fibers to transmit impulses along their length?" }, options: { en: ["A. Excitability", "B. Conductivity", "C. Plasticity", "D. Integration"] }, answer: { en: ["B. Conductivity"] } },
+            { number: 80, type: "mcq", question: { en: "80. Which system allows rapid communication between the body and the CNS for both voluntary and involuntary actions?" }, options: { en: ["A. Endocrine system", "B. Peripheral nervous system", "C. Circulatory system", "D. Respiratory system"] }, answer: { en: ["B. Peripheral nervous system"] } }
+        ];
+
+        let quizDataPart4 = [
+            { number: 1, type: "mcq", question: { en: "1. The longitudinal fissure divides the brain into two hemispheres. Which structure lies within this fissure and connects the hemispheres?" }, options: { en: ["A. Thalamus", "B. Corpus callosum", "C. Brainstem", "D. Cerebellum"] }, answer: { en: ["B. Corpus callosum"] } },
+            { number: 2, type: "mcq", question: { en: "2. Which structure is primarily responsible for coordinating voluntary movements and maintaining balance through integration of sensory and motor pathways?" }, options: { en: ["A. Cerebrum", "B. Thalamus", "C. Cerebellum", "D. Hypothalamus"] }, answer: { en: ["C. Cerebellum"] } },
+            { number: 3, type: "mcq", question: { en: "3. Which structure separates cerebrum from cerebellum?" }, options: { en: ["A. Falx cerebri", "B. Tentorium cerebelli", "C. Diaphragma sellae", "D. Falx cerebelli"] }, answer: { en: ["B. Tentorium cerebelli"] } },
+            { number: 4, type: "mcq", question: { en: "4. Which structure is involved in memory consolidation?" }, options: { en: ["A. Amygdala", "B. Hippocampus", "C. Thalamus", "D. Cerebellum"] }, answer: { en: ["B. Hippocampus"] } },
+            { number: 5, type: "mcq", question: { en: "5. Which structure is involved in memory consolidation? (Repeat)" }, options: { en: ["A. Amygdala", "B. Hippocampus", "C. Thalamus", "D. Cerebellum"] }, answer: { en: ["B. Hippocampus"] } },
+            { number: 6, type: "mcq", question: { en: "6. Which structure separates the two cerebral hemispheres?" }, options: { en: ["A. Tentorium cerebelli", "B. Falx cerebri", "C. Falx cerebelli", "D. Diaphragma sellae"] }, answer: { en: ["B. Falx cerebri"] } },
+            { number: 7, type: "mcq", question: { en: "7. Which lobe of the brain is primarily responsible for voluntary motor control?" }, options: { en: ["A. Temporal", "B. Parietal", "C. Frontal", "D. Occipital"] }, answer: { en: ["C. Frontal"] } },
+            { number: 8, type: "mcq", question: { en: "8. Which lobe is mainly involved in processing visual information?" }, options: { en: ["A. Frontal", "B. Parietal", "C. Temporal", "D. Occipital"] }, answer: { en: ["D. Occipital"] } },
+            { number: 9, type: "mcq", question: { en: "9. The meninges are protective coverings of the central nervous system arranged in layers. Which layer is the toughest and most external, providing mechanical protection?" }, options: { en: ["A. Pia mater", "B. Arachnoid mater", "C. Dura mater", "D. Subdural space"] }, answer: { en: ["C. Dura mater"] } },
+            { number: 10, type: "mcq", question: { en: "10. Which meningeal layer is thin, avascular, and lies between the dura mater and pia mater, forming a potential space beneath it?" }, options: { en: ["A. Dura mater", "B. Arachnoid mater", "C. Pia mater", "D. Epidural layer"] }, answer: { en: ["B. Arachnoid mater"] } },
+            { number: 11, type: "mcq", question: { en: "11. Which meningeal layer is closely adherent to the surface of the brain and follows all gyri and sulci?" }, options: { en: ["A. Dura mater", "B. Arachnoid mater", "C. Pia mater", "D. Subdural layer"] }, answer: { en: ["C. Pia mater"] } },
+            { number: 12, type: "mcq", question: { en: "12. The subarachnoid space contains cerebrospinal fluid and blood vessels. Between which layers is this space located?" }, options: { en: ["A. Dura and arachnoid", "B. Arachnoid and pia", "C. Pia and brain", "D. Dura and skull"] }, answer: { en: ["B. Arachnoid and pia"] } },
+            { number: 13, type: "mcq", question: { en: "13. Which space is considered a potential space between the dura mater and arachnoid mater?" }, options: { en: ["A. Epidural space", "B. Subdural space", "C. Subarachnoid space", "D. Ventricular space"] }, answer: { en: ["B. Subdural space"] } },
+            { number: 14, type: "mcq", question: { en: "14. Which meningeal space contains cerebrospinal fluid under normal physiological conditions?" }, options: { en: ["A. Epidural space", "B. Subdural space", "C. Subarachnoid space", "D. Intracerebral space"] }, answer: { en: ["C. Subarachnoid space"] } },
+            { number: 15, type: "mcq", question: { en: "15. The dura mater in the cranial cavity consists of two layers. What are these layers?" }, options: { en: ["A. Periosteal and meningeal layers", "B. Arachnoid and pia layers", "C. Neural and vascular layers", "D. External and internal layers"] }, answer: { en: ["A. Periosteal and meningeal layers"] } },
+            { number: 16, type: "mcq", question: { en: "16. Which dural reflection separates the two cerebral hemispheres?" }, options: { en: ["A. Tentorium cerebelli", "B. Falx cerebri", "C. Falx cerebelli", "D. Diaphragma sellae"] }, answer: { en: ["B. Falx cerebri"] } },
+            { number: 17, type: "mcq", question: { en: "17. Which dural fold separates the cerebrum from the cerebellum?" }, options: { en: ["A. Falx cerebri", "B. Tentorium cerebelli", "C. Falx cerebelli", "D. Diaphragma sellae"] }, answer: { en: ["B. Tentorium cerebelli"] } },
+            { number: 18, type: "mcq", question: { en: "18. Which dural fold separates the two cerebellar hemispheres?" }, options: { en: ["A. Falx cerebri", "B. Tentorium cerebelli", "C. Falx cerebelli", "D. Sellar diaphragm"] }, answer: { en: ["C. Falx cerebelli"] } },
+            { number: 19, type: "mcq", question: { en: "19. The ventricular system of the brain consists of interconnected cavities filled with cerebrospinal fluid. Which ventricles are located within the cerebral hemispheres?" }, options: { en: ["A. Third ventricles", "B. Fourth ventricles", "C. Lateral ventricles", "D. Central canal"] }, answer: { en: ["C. Lateral ventricles"] } },
+            { number: 20, type: "mcq", question: { en: "20. Each lateral ventricle communicates with the third ventricle through a specific opening. What is the name of this structure?" }, options: { en: ["A. Cerebral aqueduct", "B. Foramen of Monro", "C. Central canal", "D. Foramen of Luschka"] }, answer: { en: ["B. Foramen of Monro"] } },
+            { number: 21, type: "mcq", question: { en: "21. The third ventricle is a narrow midline cavity located between which major brain structures?" }, options: { en: ["A. Cerebral hemispheres", "B. Cerebellar hemispheres", "C. Thalami", "D. Brainstem nuclei"] }, answer: { en: ["C. Thalami"] } },
+            { number: 22, type: "mcq", question: { en: "22. The cerebral aqueduct connects which two ventricles within the brain?" }, options: { en: ["A. Lateral to third", "B. Third to fourth", "C. Fourth to central canal", "D. Lateral to fourth"] }, answer: { en: ["B. Third to fourth"] } },
+            { number: 23, type: "mcq", question: { en: "23. The fourth ventricle is anatomically positioned between which two major structures?" }, options: { en: ["A. Cerebrum and thalamus", "B. Cerebellum and brainstem", "C. Cerebrum and cerebellum", "D. Thalamus and hypothalamus"] }, answer: { en: ["B. Cerebellum and brainstem"] } },
+            { number: 24, type: "mcq", question: { en: "24. Cerebrospinal fluid exits the fourth ventricle into the subarachnoid space through which apertures?" }, options: { en: ["A. Foramen of Monro", "B. Aqueduct of Sylvius", "C. Foramina of Luschka and Magendie", "D. Central canal"] }, answer: { en: ["C. Foramina of Luschka and Magendie"] } },
+            { number: 25, type: "mcq", question: { en: "25. Which part of the lateral ventricle extends into the temporal lobe?" }, options: { en: ["A. Anterior horn", "B. Posterior horn", "C. Inferior horn", "D. Body"] }, answer: { en: ["C. Inferior horn"] } },
+            { number: 26, type: "mcq", question: { en: "26. Which part of the lateral ventricle extends into the frontal lobe?" }, options: { en: ["A. Body", "B. Inferior horn", "C. Anterior horn", "D. Posterior horn"] }, answer: { en: ["C. Anterior horn"] } },
+            { number: 27, type: "mcq", question: { en: "27. Which part of the lateral ventricle extends into the occipital lobe?" }, options: { en: ["A. Body", "B. Posterior horn", "C. Inferior horn", "D. Anterior horn"] }, answer: { en: ["B. Posterior horn"] } },
+            { number: 28, type: "mcq", question: { en: "28. Which structure forms the roof of the third ventricle?" }, options: { en: ["A. Thalamus", "B. Hypothalamus", "C. Corpus callosum", "D. Brainstem"] }, answer: { en: ["C. Corpus callosum"] } },
+            { number: 29, type: "mcq", question: { en: "29. Which structure forms the floor of the third ventricle?" }, options: { en: ["A. Thalamus", "B. Hypothalamus", "C. Cerebellum", "D. Corpus callosum"] }, answer: { en: ["B. Hypothalamus"] } },
+            { number: 30, type: "mcq", question: { en: "30. Which structure forms the lateral walls of the third ventricle?" }, options: { en: ["A. Hypothalamus", "B. Thalamus", "C. Cerebellum", "D. Brainstem"] }, answer: { en: ["B. Thalamus"] } },
+            { number: 31, type: "mcq", question: { en: "31. Which structure forms the floor of the fourth ventricle?" }, options: { en: ["A. Cerebellum", "B. Brainstem (pons and medulla)", "C. Thalamus", "D. Corpus callosum"] }, answer: { en: ["B. Brainstem (pons and medulla)"] } },
+            { number: 32, type: "mcq", question: { en: "32. Which structure forms the roof of the fourth ventricle?" }, options: { en: ["A. Brainstem", "B. Cerebellum", "C. Thalamus", "D. Hypothalamus"] }, answer: { en: ["B. Cerebellum"] } },
+            { number: 33, type: "mcq", question: { en: "33. Cerebrospinal fluid is produced mainly by which structure within the ventricles?" }, options: { en: ["A. Arachnoid villi", "B. Choroid plexus", "C. Dura mater", "D. Pia mater"] }, answer: { en: ["B. Choroid plexus"] } },
+            { number: 34, type: "mcq", question: { en: "34. Which mechanism is responsible for the absorption of cerebrospinal fluid into the venous system?" }, options: { en: ["A. Choroid plexus", "B. Arachnoid granulations", "C. Ventricular walls", "D. Dura mater"] }, answer: { en: ["B. Arachnoid granulations"] } },
+            { number: 35, type: "mcq", question: { en: "35. Which condition results from obstruction of CSF flow within the ventricular system leading to ventricular enlargement?" }, options: { en: ["A. Meningitis", "B. Hydrocephalus", "C. Encephalitis", "D. Stroke"] }, answer: { en: ["B. Hydrocephalus"] } },
+            { number: 36, type: "mcq", question: { en: "36. Which ventricular structure continues inferiorly as the central canal of the spinal cord?" }, options: { en: ["A. Lateral ventricle", "B. Third ventricle", "C. Fourth ventricle", "D. Aqueduct"] }, answer: { en: ["C. Fourth ventricle"] } },
+            { number: 37, type: "mcq", question: { en: "37. What is the approximate daily production rate of CSF?" }, options: { en: ["A. 50 mL/day", "B. 150 mL/day", "C. 500 mL/day", "D. 1000 mL/day"] }, answer: { en: ["C. 500 mL/day"] } },
+            { number: 38, type: "mcq", question: { en: "38. Which function is NOT a role of cerebrospinal fluid?" }, options: { en: ["A. Mechanical protection", "B. Nutrient transport", "C. Hormone production", "D. Waste removal"] }, answer: { en: ["C. Hormone production"] } },
+            { number: 39, type: "mcq", question: { en: "39. The limbic system is a complex network of cortical and subcortical structures involved in emotion, behavior, and memory. Which structure is primarily responsible for memory consolidation and spatial navigation?" }, options: { en: ["A. Amygdala", "B. Hippocampus", "C. Thalamus", "D. Hypothalamus"] }, answer: { en: ["B. Hippocampus"] } },
+            { number: 40, type: "mcq", question: { en: "40. Which limbic structure plays a central role in emotional processing, particularly fear, aggression, and threat detection?" }, options: { en: ["A. Hippocampus", "B. Amygdala", "C. Cingulate gyrus", "D. Fornix"] }, answer: { en: ["B. Amygdala"] } },
+            { number: 41, type: "mcq", question: { en: "41. Which structure connects the limbic system to the endocrine system, allowing emotional states to influence hormonal responses?" }, options: { en: ["A. Thalamus", "B. Hypothalamus", "C. Cerebellum", "D. Pons"] }, answer: { en: ["B. Hypothalamus"] } },
+            { number: 42, type: "mcq", question: { en: "42. The diencephalon is a central brain structure located between the cerebral hemispheres and the brainstem. Which major components constitute the diencephalon?" }, options: { en: ["A. Cerebellum and brainstem", "B. Thalamus, hypothalamus, epithalamus, subthalamus", "C. Frontal and parietal lobes", "D. Midbrain and pons"] }, answer: { en: ["B. Thalamus, hypothalamus, epithalamus, subthalamus"] } },
+            { number: 43, type: "mcq", question: { en: "43. Which component of the diencephalon acts as the principal relay station for sensory information to the cerebral cortex?" }, options: { en: ["A. Hypothalamus", "B. Epithalamus", "C. Thalamus", "D. Subthalamus"] }, answer: { en: ["C. Thalamus"] } },
+            { number: 44, type: "mcq", question: { en: "44. Which part of the diencephalon is primarily responsible for maintaining homeostasis and regulating autonomic and endocrine functions?" }, options: { en: ["A. Thalamus", "B. Hypothalamus", "C. Epithalamus", "D. Subthalamus"] }, answer: { en: ["B. Hypothalamus"] } },
+            { number: 45, type: "mcq", question: { en: "45. The third ventricle is closely associated with the diencephalon. Which structure forms its lateral walls?" }, options: { en: ["A. Cerebellum", "B. Thalamus", "C. Hypothalamus", "D. Brainstem"] }, answer: { en: ["B. Thalamus"] } },
+            { number: 46, type: "mcq", question: { en: "46. Which structure of the diencephalon contains the pineal gland and is involved in circadian rhythm regulation?" }, options: { en: ["A. Thalamus", "B. Hypothalamus", "C. Epithalamus", "D. Subthalamus"] }, answer: { en: ["C. Epithalamus"] } },
+            { number: 47, type: "mcq", question: { en: "47. Which part of the diencephalon is functionally associated with motor control and is closely related to the basal ganglia?" }, options: { en: ["A. Thalamus", "B. Hypothalamus", "C. Epithalamus", "D. Subthalamus"] }, answer: { en: ["D. Subthalamus"] } },
+            { number: 48, type: "mcq", question: { en: "48. Which structure of the hypothalamus connects it to the pituitary gland?" }, options: { en: ["A. Corpus callosum", "B. Fornix", "C. Infundibulum", "D. Optic chiasm"] }, answer: { en: ["C. Infundibulum"] } },
+            { number: 49, type: "mcq", question: { en: "49. Which diencephalic structure forms the floor of the third ventricle?" }, options: { en: ["A. Thalamus", "B. Hypothalamus", "C. Epithalamus", "D. Subthalamus"] }, answer: { en: ["B. Hypothalamus"] } },
+            { number: 50, type: "mcq", question: { en: "50. Which diencephalic structure is located superior to the hypothalamus and forms the bulk of the lateral walls of the third ventricle?" }, options: { en: ["A. Epithalamus", "B. Subthalamus", "C. Thalamus", "D. Brainstem"] }, answer: { en: ["C. Thalamus"] } },
+            { number: 51, type: "mcq", question: { en: "52. Which part of the diencephalon is directly involved in regulating body temperature, hunger, thirst, and circadian rhythms?" }, options: { en: ["A. Thalamus", "B. Hypothalamus", "C. Epithalamus", "D. Subthalamus"] }, answer: { en: ["B. Hypothalamus"] } },
+            { number: 52, type: "mcq", question: { en: "53. Which structure within the diencephalon serves as a major integration center for emotional and autonomic responses through its connection with the limbic system?" }, options: { en: ["A. Thalamus", "B. Hypothalamus", "C. Epithalamus", "D. Subthalamus"] }, answer: { en: ["B. Hypothalamus"] } },
+            { number: 53, type: "mcq", question: { en: "54. Which part of the diencephalon is involved in relaying motor signals from the cerebellum and basal ganglia to the cerebral cortex?" }, options: { en: ["A. Hypothalamus", "B. Thalamus", "C. Epithalamus", "D. Subthalamus"] }, answer: { en: ["B. Thalamus"] } },
+            { number: 54, type: "mcq", question: { en: "55. Which anatomical structure of the diencephalon contains the habenular nuclei and plays a role in emotional and reward processing?" }, options: { en: ["A. Thalamus", "B. Hypothalamus", "C. Epithalamus", "D. Subthalamus"] }, answer: { en: ["C. Epithalamus"] } },
+            { number: 55, type: "mcq", question: { en: "56. Which structure is located anteriorly in the diencephalon and is involved in visual pathway crossing?" }, options: { en: ["A. Optic tract", "B. Optic chiasm", "C. Pineal gland", "D. Fornix"] }, answer: { en: ["B. Optic chiasm"] } },
+            { number: 56, type: "mcq", question: { en: "57. Which diencephalic structure is most directly involved in integrating sensory input and projecting it to specific cortical areas for conscious perception?" }, options: { en: ["A. Hypothalamus", "B. Epithalamus", "C. Thalamus", "D. Subthalamus"] }, answer: { en: ["C. Thalamus"] } },
+            { number: 57, type: "mcq", question: { en: "58. The brainstem is a vital structure connecting the cerebrum to the spinal cord and is composed of three major parts arranged from superior to inferior. Which sequence correctly represents this anatomical order?" }, options: { en: ["A. Medulla → Pons → Midbrain", "B. Midbrain → Pons → Medulla", "C. Pons → Medulla → Midbrain", "D. Midbrain → Medulla → Pons"] }, answer: { en: ["B. Midbrain → Pons → Medulla"] } },
+            { number: 58, type: "mcq", question: { en: "59. Which part of the brainstem contains the cerebral peduncles and plays a major role in motor pathway transmission?" }, options: { en: ["A. Medulla oblongata", "B. Pons", "C. Midbrain", "D. Cerebellum"] }, answer: { en: ["C. Midbrain"] } },
+            { number: 59, type: "mcq", question: { en: "60. Which structure of the brainstem contains nuclei responsible for regulating respiration, heart rate, and blood pressure?" }, options: { en: ["A. Midbrain", "B. Pons", "C. Medulla oblongata", "D. Thalamus"] }, answer: { en: ["C. Medulla oblongata"] } },
+            { number: 60, type: "mcq", question: { en: "61. The pons functions as a bridge connecting different parts of the brain. Which structure does it primarily connect with the cerebellum?" }, options: { en: ["A. Cerebral peduncles", "B. Middle cerebellar peduncles", "C. Inferior cerebellar peduncles", "D. Superior cerebellar peduncles"] }, answer: { en: ["B. Middle cerebellar peduncles"] } },
+            { number: 61, type: "mcq", question: { en: "62. Which cranial nerve nuclei are located within the brainstem?" }, options: { en: ["A. I–II", "B. III–XII", "C. I–XII", "D. Only V–VIII"] }, answer: { en: ["B. III–XII"] } },
+            { number: 62, type: "mcq", question: { en: "63. Which part of the brainstem contains the substantia nigra, which is involved in motor control and dopamine production?" }, options: { en: ["A. Medulla", "B. Pons", "C. Midbrain", "D. Cerebellum"] }, answer: { en: ["C. Midbrain"] } },
+            { number: 63, type: "mcq", question: { en: "64. Which structure within the brainstem is involved in visual reflexes and eye movement control?" }, options: { en: ["A. Pons", "B. Medulla", "C. Midbrain", "D. Thalamus"] }, answer: { en: ["C. Midbrain"] } },
+            { number: 64, type: "mcq", question: { en: "65. Which brainstem structure forms the floor of the fourth ventricle along with the medulla?" }, options: { en: ["A. Midbrain", "B. Cerebellum", "C. Pons", "D. Thalamus"] }, answer: { en: ["C. Pons"] } },
+            { number: 65, type: "mcq", question: { en: "66. Which part of the brainstem contains the pyramidal decussation where corticospinal fibers cross?" }, options: { en: ["A. Midbrain", "B. Pons", "C. Medulla oblongata", "D. Thalamus"] }, answer: { en: ["C. Medulla oblongata"] } },
+            { number: 66, type: "mcq", question: { en: "67. Which structure of the brainstem is responsible for auditory reflexes through the inferior colliculus?" }, options: { en: ["A. Medulla", "B. Pons", "C. Midbrain", "D. Cerebellum"] }, answer: { en: ["C. Midbrain"] } },
+            { number: 67, type: "mcq", question: { en: "68. Which part of the brainstem is primarily involved in regulating sleep and arousal through the reticular formation?" }, options: { en: ["A. Medulla", "B. Pons", "C. Midbrain", "D. All parts"] }, answer: { en: ["D. All parts"] } },
+            { number: 68, type: "mcq", question: { en: "69. Which cerebellar peduncle connects the cerebellum to the medulla?" }, options: { en: ["A. Superior cerebellar peduncle", "B. Middle cerebellar peduncle", "C. Inferior cerebellar peduncle", "D. None"] }, answer: { en: ["C. Inferior cerebellar peduncle"] } },
+            { number: 69, type: "mcq", question: { en: "70. Which part of the brainstem contains nuclei of cranial nerves V, VI, VII, and VIII?" }, options: { en: ["A. Midbrain", "B. Pons", "C. Medulla", "D. Thalamus"] }, answer: { en: ["B. Pons"] } },
+            { number: 70, type: "mcq", question: { en: "71. Which part of the brainstem contains nuclei of cranial nerves IX, X, XI, and XII?" }, options: { en: ["A. Midbrain", "B. Pons", "C. Medulla", "D. Cerebellum"] }, answer: { en: ["C. Medulla"] } },
+            { number: 71, type: "mcq", question: { en: "72. Which major function is shared by all parts of the brainstem?" }, options: { en: ["A. Hormone production", "B. Visual processing only", "C. Conduction of ascending and descending tracts", "D. Memory storage"] }, answer: { en: ["C. Conduction of ascending and descending tracts"] } },
+            { number: 72, type: "mcq", question: { en: "72. The cerebellum is anatomically located in the posterior cranial fossa and plays a key role in coordination of movement. Which structure separates the cerebellum from the occipital lobes of the cerebrum?" }, options: { en: ["A. Falx cerebri", "B. Tentorium cerebelli", "C. Falx cerebelli", "D. Diaphragma sellae"] }, answer: { en: ["B. Tentorium cerebelli"] } },
+            { number: 73, type: "mcq", question: { en: "73. The cerebellum is divided into hemispheres and a central midline structure. What is the name of this central structure?" }, options: { en: ["A. Vermis", "B. Peduncle", "C. Tonsil", "D. Nodule"] }, answer: { en: ["A. Vermis"] } },
+            { number: 74, type: "mcq", question: { en: "74. Which functional division of the cerebellum is primarily involved in balance and control of axial muscles?" }, options: { en: ["A. Cerebrocerebellum", "B. Spinocerebellum", "C. Vestibulocerebellum", "D. Neocerebellum"] }, answer: { en: ["C. Vestibulocerebellum"] } },
+            { number: 75, type: "mcq", question: { en: "75. Which cerebellar division is most involved in fine motor coordination of distal limb movements?" }, options: { en: ["A. Vestibulocerebellum", "B. Spinocerebellum", "C. Cerebrocerebellum", "D. Flocculonodular lobe"] }, answer: { en: ["C. Cerebrocerebellum"] } },
+            { number: 76, type: "mcq", question: { en: "76. The cerebellum communicates with other parts of the brain via three pairs of peduncles. Which peduncle connects the cerebellum to the pons?" }, options: { en: ["A. Superior cerebellar peduncle", "B. Middle cerebellar peduncle", "C. Inferior cerebellar peduncle", "D. Medullary peduncle"] }, answer: { en: ["B. Middle cerebellar peduncle"] } },
+            { number: 77, type: "mcq", question: { en: "77. Which cerebellar peduncle primarily carries output signals from the cerebellum to the midbrain and thalamus?" }, options: { en: ["A. Inferior cerebellar peduncle", "B. Middle cerebellar peduncle", "C. Superior cerebellar peduncle", "D. None"] }, answer: { en: ["C. Superior cerebellar peduncle"] } },
+            { number: 78, type: "mcq", question: { en: "78. Which deep cerebellar nucleus is the largest and most important for motor planning and coordination?" }, options: { en: ["A. Fastigial nucleus", "B. Globose nucleus", "C. Emboliform nucleus", "D. Dentate nucleus"] }, answer: { en: ["D. Dentate nucleus"] } },
+            { number: 79, type: "mcq", question: { en: "79. Which cerebellar lobe is most closely associated with vestibular function and balance?" }, options: { en: ["A. Anterior lobe", "B. Posterior lobe", "C. Flocculonodular lobe", "D. Vermis"] }, answer: { en: ["C. Flocculonodular lobe"] } },
+            { number: 80, type: "mcq", question: { en: "80. Which type of neurons are the principal output neurons of the cerebellar cortex?" }, options: { en: ["A. Granule cells", "B. Basket cells", "C. Purkinje cells", "D. Stellate cells"] }, answer: { en: ["C. Purkinje cells"] } },
+            { number: 81, type: "mcq", question: { en: "81. Which clinical feature is most characteristic of cerebellar dysfunction?" }, options: { en: ["A. Paralysis", "B. Sensory loss", "C. Ataxia and coordination deficits", "D. Aphasia"] }, answer: { en: ["C. Ataxia and coordination deficits"] } }
+        ];
+
+        let quizDataPart5 = [
+            { number: 1, type: "mcq", question: { en: "1. Which is the largest part of the human brain?" }, options: { en: ["a. Cerebellum", "b. Medulla oblongata", "c. Cerebrum", "d. Thalamus"] }, answer: { en: ["c. Cerebrum"] } },
+            { number: 2, type: "mcq", question: { en: "2. How many main lobes are found in each cerebral hemisphere?" }, options: { en: ["a. Two", "b. Three", "c. Four", "d. Five"] }, answer: { en: ["c. Four"] } },
+            { number: 3, type: "mcq", question: { en: "3. Which part of the brain is primarily responsible for balance, posture, and muscle coordination?" }, options: { en: ["a. Cerebrum", "b. Cerebellum", "c. Pons", "d. Hypothalamus"] }, answer: { en: ["b. Cerebellum"] } },
+            { number: 4, type: "mcq", question: { en: "4. Which structure connects the left and right hemispheres of the brain?" }, options: { en: ["a. Brainstem", "b. Corpus callosum", "c. Hippocampus", "d. Central sulcus"] }, answer: { en: ["b. Corpus callosum"] } },
+            { number: 5, type: "mcq", question: { en: "5. The primary visual processing center is located in which lobe?" }, options: { en: ["a. Frontal lobe", "b. Parietal lobe", "c. Temporal lobe", "d. Occipital lobe"] }, answer: { en: ["d. Occipital lobe"] } },
+            { number: 6, type: "mcq", question: { en: "6. Which part of the brainstem regulates basic life functions like breathing and heart rate?" }, options: { en: ["a. Midbrain", "b. Pons", "c. Medulla oblongata", "d. Thalamus"] }, answer: { en: ["c. Medulla oblongata"] } },
+            { number: 7, type: "mcq", question: { en: "7. The \"master gland\" of the endocrine system, the pituitary, is controlled by which brain structure?" }, options: { en: ["a. Amygdala", "b. Hypothalamus", "c. Hippocampus", "d. Pineal gland"] }, answer: { en: ["b. Hypothalamus"] } },
+            { number: 8, type: "mcq", question: { en: "8. Which lobe is most closely associated with personality, decision-making, and voluntary movement?" }, options: { en: ["a. Frontal lobe", "b. Parietal lobe", "c. Temporal lobe", "d. Occipital lobe"] }, answer: { en: ["a. Frontal lobe"] } },
+            { number: 9, type: "mcq", question: { en: "9. Roughly how many neurons are contained in the adult human brain?" }, options: { en: ["a. 1 billion", "b. 50 billion", "c. 86 billion", "d. 250 billion"] }, answer: { en: ["c. 86 billion"] } },
+            { number: 10, type: "mcq", question: { en: "10. Which area of the brain is specifically responsible for the production of speech?" }, options: { en: ["a. Wernicke’s area", "b. Broca’s area", "c. Basal ganglia", "d. Substantia nigra"] }, answer: { en: ["b. Broca’s area"] } },
+            { number: 11, type: "mcq", question: { en: "11. What is the name of the thin, wrinkled outer layer of the cerebrum where high-level processing occurs?" }, options: { en: ["a. White matter", "b. Cerebral cortex", "c. Meninges", "d. Myelin sheath"] }, answer: { en: ["b. Cerebral cortex"] } },
+            { number: 12, type: "mcq", question: { en: "12. Which part of the limbic system is primarily involved in forming new memories?" }, options: { en: ["a. Amygdala", "b. Hippocampus", "c. Thalamus", "d. Fornix"] }, answer: { en: ["b. Hippocampus"] } },
+            { number: 13, type: "mcq", question: { en: "13. The protective membranes that surround the brain and spinal cord are called the:" }, options: { en: ["a. Glia", "b. Ventricles", "c. Meninges", "d. Sulci"] }, answer: { en: ["c. Meninges"] } },
+            { number: 14, type: "mcq", question: { en: "14. Which structure acts as a \"relay station,\" directing sensory information to the correct parts of the cortex?" }, options: { en: ["a. Thalamus", "b. Hypothalamus", "c. Cerebellum", "d. Pons"] }, answer: { en: ["a. Thalamus"] } },
+            { number: 15, type: "mcq", question: { en: "15. What fluid cushions the brain within the skull and circulates through its ventricles?" }, options: { en: ["a. Lymphatic fluid", "b. Synovial fluid", "c. Cerebrospinal fluid (CSF)", "d. Interstitial fluid"] }, answer: { en: ["c. Cerebrospinal fluid (CSF)"] } },
+            { number: 16, type: "mcq", question: { en: "16. Which lobe is primarily responsible for processing auditory information and language comprehension?" }, options: { en: ["a. Frontal lobe", "b. Parietal lobe", "c. Temporal lobe", "d. Occipital lobe"] }, answer: { en: ["c. Temporal lobe"] } },
+            { number: 17, type: "mcq", question: { en: "17. The amygdala is most famous for its role in processing which emotion?" }, options: { en: ["a. Joy", "b. Fear", "c. Sadness", "d. Disgust"] }, answer: { en: ["b. Fear"] } },
+            { number: 18, type: "mcq", question: { en: "18. What do we call the fatty substance that insulates axons and speeds up electrical signals?" }, options: { en: ["a. Gray matter", "b. Dendrite", "c. Myelin sheath", "d. Synapse"] }, answer: { en: ["c. Myelin sheath"] } },
+            { number: 19, type: "mcq", question: { en: "19. Which part of the brain is considered the \"emotional brain\"?" }, options: { en: ["a. Brainstem", "b. Limbic system", "c. Cerebral cortex", "d. Basal ganglia"] }, answer: { en: ["b. Limbic system"] } },
+            { number: 20, type: "mcq", question: { en: "20. The gap between two neurons where chemical signals are transmitted is called the:" }, options: { en: ["a. Axon", "b. Node of Ranvier", "c. Dendrite", "d. Synapse"] }, answer: { en: ["d. Synapse"] } }
+        ];
+
+        let quizDataPart6 = [
+            { number: 1, type: "mcq", question: { en: "1. Which spinal nerve roots typically form the cervical plexus?" }, options: { en: ["a. C1–C4", "b. C5–T1", "c. L1–L4", "d. S1–S4"] }, answer: { en: ["a. C1–C4"] } },
+            { number: 2, type: "mcq", question: { en: "2. The phrenic nerve, which innervates the diaphragm, primarily arises from which spinal levels?" }, options: { en: ["a. C1–C2", "b. C3–C5", "c. C5–C7", "d. T1–T2"] }, answer: { en: ["b. C3–C5"] } },
+            { number: 3, type: "mcq", question: { en: "3. Which of the following is the correct sequence of the brachial plexus from proximal to distal?" }, options: { en: ["a. Trunks, Roots, Cords, Divisions, Branches", "b. Roots, Trunks, Divisions, Cords, Branches", "c. Roots, Divisions, Trunks, Cords, Branches", "d. Cords, Trunks, Roots, Divisions, Branches"] }, answer: { en: ["b. Roots, Trunks, Divisions, Cords, Branches"] } },
+            { number: 4, type: "mcq", question: { en: "4. Damage to the upper trunk of the brachial plexus (C5–C6) typically results in which clinical condition?" }, options: { en: ["a. Claw hand", "b. Wrist drop", "c. Erb’s palsy", "d. Ape hand"] }, answer: { en: ["c. Erb’s palsy"] } },
+            { number: 5, type: "mcq", question: { en: "5. Which nerve arises from the posterior cord of the brachial plexus?" }, options: { en: ["a. Median nerve", "b. Ulnar nerve", "c. Musculocutaneous nerve", "d. Radial nerve"] }, answer: { en: ["d. Radial nerve"] } },
+            { number: 6, type: "mcq", question: { en: "6. The lumbar plexus is found within the substance of which muscle?" }, options: { en: ["a. Quadratus lumborum", "b. Psoas major", "c. Iliacus", "d. Piriformis"] }, answer: { en: ["b. Psoas major"] } },
+            { number: 7, type: "mcq", question: { en: "7. Which nerve of the lumbar plexus innervates the quadriceps femoris muscle group?" }, options: { en: ["a. Obturator nerve", "b. Femoral nerve", "c. Sciatic nerve", "d. Ilioinguinal nerve"] }, answer: { en: ["b. Femoral nerve"] } },
+            { number: 8, type: "mcq", question: { en: "8. The sacral plexus is formed by the anterior rami of which spinal nerves?" }, options: { en: ["a. L1–L4", "b. L4–S4", "c. T12–L3", "d. S2–S5"] }, answer: { en: ["b. L4–S4"] } },
+            { number: 9, type: "mcq", question: { en: "9. Which is the largest nerve in the human body, arising from the sacral plexus?" }, options: { en: ["a. Femoral nerve", "b. Pudendal nerve", "c. Sciatic nerve", "d. Tibial nerve"] }, answer: { en: ["c. Sciatic nerve"] } },
+            { number: 10, type: "mcq", question: { en: "10. \"Winged scapula\" is caused by damage to the long thoracic nerve, which arises from which part of the brachial plexus?" }, options: { en: ["a. Roots", "b. Trunks", "c. Cords", "d. Divisions"] }, answer: { en: ["a. Roots"] } },
+            { number: 11, type: "mcq", question: { en: "11. The axillary nerve innervates which of the following muscles?" }, options: { en: ["a. Biceps brachii", "b. Deltoid", "c. Triceps brachii", "d. Pectoralis major"] }, answer: { en: ["b. Deltoid"] } },
+            { number: 12, type: "mcq", question: { en: "12. Which nerve is responsible for the \"funny bone\" sensation when hit at the elbow?" }, options: { en: ["a. Radial nerve", "b. Median nerve", "c. Ulnar nerve", "d. Axillary nerve"] }, answer: { en: ["c. Ulnar nerve"] } },
+            { number: 13, type: "mcq", question: { en: "13. The obturator nerve is responsible for innervating which muscle group?" }, options: { en: ["a. Hip flexors", "b. Knee extensors", "c. Hip adductors", "d. Plantar flexors"] }, answer: { en: ["c. Hip adductors"] } },
+            { number: 14, type: "mcq", question: { en: "14. Which nerve provides motor innervation to the muscles of the perineum and external genitalia?" }, options: { en: ["a. Sciatic nerve", "b. Pudendal nerve", "c. Obturator nerve", "d. Femoral nerve"] }, answer: { en: ["b. Pudendal nerve"] } },
+            { number: 15, type: "mcq", question: { en: "15. Ansa cervicalis is a loop of nerves that is part of which plexus?" }, options: { en: ["a. Brachial plexus", "b. Cervical plexus", "c. Lumbar plexus", "d. Sacral plexus"] }, answer: { en: ["b. Cervical plexus"] } },
+            { number: 16, type: "mcq", question: { en: "16. The \"waiter’s tip\" position of the arm is a classic sign of injury to which roots?" }, options: { en: ["a. C5–C6", "b. C8–T1", "c. L2–L4", "d. S1–S3"] }, answer: { en: ["a. C5–C6"] } },
+            { number: 17, type: "mcq", question: { en: "17. Which nerve travels through the carpal tunnel of the wrist?" }, options: { en: ["a. Ulnar nerve", "b. Radial nerve", "c. Median nerve", "d. Musculocutaneous nerve"] }, answer: { en: ["c. Median nerve"] } },
+            { number: 18, type: "mcq", question: { en: "18. The sciatic nerve eventually divides into which two major branches?" }, options: { en: ["a. Femoral and Obturator", "b. Tibial and Common Fibular", "c. Median and Ulnar", "d. Axillary and Radial"] }, answer: { en: ["b. Tibial and Common Fibular"] } },
+            { number: 19, type: "mcq", question: { en: "19. Which plexus serves the skin and muscles of the pelvic floor?" }, options: { en: ["a. Lumbar plexus", "b. Sacral plexus", "c. Cervical plexus", "d. Brachial plexus"] }, answer: { en: ["b. Sacral plexus"] } },
+            { number: 20, type: "mcq", question: { en: "20. Most nerve plexuses are formed by the union of:" }, options: { en: ["a. Dorsal rami", "b. Ventral rami", "c. White rami communicantes", "d. Gray rami communicantes"] }, answer: { en: ["b. Ventral rami"] } }
+        ];
+
+        let quizDataPart7 = [
+            { number: 1, type: "mcq", question: { en: "1. The cervical plexus is formed by the anterior rami of the first four cervical spinal nerves. Which spinal levels contribute to its formation?" }, options: { en: ["A. C1–C3", "B. C1–C4", "C. C2–C5", "D. C3–C6"] }, answer: { en: ["B. C1–C4"] } },
+            { number: 2, type: "mcq", question: { en: "2. The cervical plexus provides both sensory and motor innervation to structures in the neck. Which type of fibers are predominantly present in this plexus?" }, options: { en: ["A. Pure motor", "B. Pure sensory", "C. Mixed motor and sensory", "D. Autonomic only"] }, answer: { en: ["C. Mixed motor and sensory"] } },
+            { number: 3, type: "mcq", question: { en: "3. Which major motor nerve arises from the cervical plexus and is essential for diaphragmatic movement?" }, options: { en: ["A. Vagus nerve", "B. Phrenic nerve", "C. Accessory nerve", "D. Hypoglossal nerve"] }, answer: { en: ["B. Phrenic nerve"] } },
+            { number: 4, type: "mcq", question: { en: "4. The phrenic nerve originates from which spinal cord segments, although it is closely related to the cervical plexus?" }, options: { en: ["A. C1–C2", "B. C2–C4", "C. C3–C5", "D. C4–C6"] }, answer: { en: ["C. C3–C5"] } },
+            { number: 5, type: "mcq", question: { en: "5. Which sensory branch of the cervical plexus supplies the skin over the clavicle and shoulder region?" }, options: { en: ["A. Lesser occipital nerve", "B. Greater auricular nerve", "C. Transverse cervical nerve", "D. Supraclavicular nerves"] }, answer: { en: ["D. Supraclavicular nerves"] } },
+            { number: 6, type: "mcq", question: { en: "6. Which sensory nerve of the cervical plexus ascends along the posterior border of the sternocleidomastoid muscle to supply the scalp posterior to the ear?" }, options: { en: ["A. Greater auricular nerve", "B. Lesser occipital nerve", "C. Supraclavicular nerve", "D. Transverse cervical nerve"] }, answer: { en: ["B. Lesser occipital nerve"] } },
+            { number: 7, type: "mcq", question: { en: "7. Which cervical plexus branch supplies sensation to the anterior neck region?" }, options: { en: ["A. Greater auricular nerve", "B. Lesser occipital nerve", "C. Transverse cervical nerve", "D. Supraclavicular nerve"] }, answer: { en: ["C. Transverse cervical nerve"] } },
+            { number: 8, type: "mcq", question: { en: "8. Which cervical plexus nerve provides sensation to the skin over the parotid gland and angle of the mandible?" }, options: { en: ["A. Lesser occipital nerve", "B. Greater auricular nerve", "C. Transverse cervical nerve", "D. Supraclavicular nerve"] }, answer: { en: ["B. Greater auricular nerve"] } },
+            { number: 9, type: "mcq", question: { en: "9. The cervical plexus lies deep to which muscle in the neck?" }, options: { en: ["A. Trapezius", "B. Sternocleidomastoid", "C. Platysma", "D. Scalene anterior"] }, answer: { en: ["B. Sternocleidomastoid"] } },
+            { number: 10, type: "mcq", question: { en: "10. Which anatomical landmark is commonly used to identify the point where the cutaneous branches of the cervical plexus emerge?" }, options: { en: ["A. Carotid triangle", "B. Erb’s point (nerve point of neck)", "C. Jugular foramen", "D. Clavicle"] }, answer: { en: ["B. Erb’s point (nerve point of neck)"] } },
+            { number: 11, type: "mcq", question: { en: "11. The brachial plexus is formed by the anterior rami of specific spinal nerves that supply the upper limb. Which spinal nerve roots contribute to its formation?" }, options: { en: ["A. C1–C4", "B. C4–C8", "C. C5–T1", "D. C6–T2"] }, answer: { en: ["C. C5–T1"] } },
+            { number: 12, type: "mcq", question: { en: "12. The brachial plexus is organized into roots, trunks, divisions, cords, and branches. Which structure is formed by the union of the C5 and C6 roots?" }, options: { en: ["A. Middle trunk", "B. Inferior trunk", "C. Superior trunk", "D. Posterior cord"] }, answer: { en: ["C. Superior trunk"] } },
+            { number: 13, type: "mcq", question: { en: "13. Which trunk of the brachial plexus is formed by the continuation of the C7 root alone?" }, options: { en: ["A. Superior trunk", "B. Middle trunk", "C. Inferior trunk", "D. Posterior cord"] }, answer: { en: ["B. Middle trunk"] } },
+            { number: 14, type: "mcq", question: { en: "14. Each trunk of the brachial plexus divides into anterior and posterior divisions. Which divisions primarily supply the flexor compartments of the upper limb?" }, options: { en: ["A. Posterior divisions", "B. Anterior divisions", "C. Mixed divisions", "D. Terminal branches"] }, answer: { en: ["B. Anterior divisions"] } },
+            { number: 15, type: "mcq", question: { en: "15. The cords of the brachial plexus are named according to their relationship with which anatomical structure?" }, options: { en: ["A. Clavicle", "B. First rib", "C. Axillary artery", "D. Subclavian vein"] }, answer: { en: ["C. Axillary artery"] } },
+            { number: 16, type: "mcq", question: { en: "16. Which cord of the brachial plexus gives rise to the musculocutaneous nerve?" }, options: { en: ["A. Posterior cord", "B. Medial cord", "C. Lateral cord", "D. Inferior trunk"] }, answer: { en: ["C. Lateral cord"] } },
+            { number: 17, type: "mcq", question: { en: "17. Which terminal branch arises from both the medial and lateral cords of the brachial plexus?" }, options: { en: ["A. Ulnar nerve", "B. Radial nerve", "C. Median nerve", "D. Axillary nerve"] }, answer: { en: ["C. Median nerve"] } },
+            { number: 18, type: "mcq", question: { en: "18. Which nerve arises from the posterior cord and innervates the extensor muscles of the arm and forearm?" }, options: { en: ["A. Musculocutaneous nerve", "B. Median nerve", "C. Ulnar nerve", "D. Radial nerve"] }, answer: { en: ["D. Radial nerve"] } },
+            { number: 19, type: "mcq", question: { en: "19. Which nerve arises from the posterior cord and innervates the deltoid and teres minor muscles?" }, options: { en: ["A. Radial nerve", "B. Axillary nerve", "C. Musculocutaneous nerve", "D. Median nerve"] }, answer: { en: ["B. Axillary nerve"] } },
+            { number: 20, type: "mcq", question: { en: "20. Within the brachial plexus, the posterior cord gives rise to several important terminal and collateral branches. Which combination of nerves arises directly from the posterior cord?" }, options: { en: ["A. Musculocutaneous and median nerves", "B. Ulnar and median nerves", "C. Axillary and radial nerves", "D. Musculocutaneous and ulnar nerves"] }, answer: { en: ["C. Axillary and radial nerves"] } },
+            { number: 21, type: "mcq", question: { en: "21. The lumbar plexus is formed by the anterior rami of specific spinal nerves located within the posterior abdominal wall. Which spinal levels contribute to its formation?" }, options: { en: ["A. T12–L3", "B. L1–L4", "C. L2–L5", "D. L3–S1"] }, answer: { en: ["B. L1–L4"] } },
+            { number: 22, type: "mcq", question: { en: "22. The lumbar plexus is anatomically located within which muscle of the posterior abdominal wall?" }, options: { en: ["A. Quadratus lumborum", "B. Psoas major", "C. Iliacus", "D. Transversus abdominis"] }, answer: { en: ["B. Psoas major"] } },
+            { number: 23, type: "mcq", question: { en: "23. Which major nerve of the lumbar plexus emerges from the lateral border of the psoas major and supplies the anterior thigh muscles?" }, options: { en: ["A. Obturator nerve", "B. Femoral nerve", "C. Sciatic nerve", "D. Iliohypogastric nerve"] }, answer: { en: ["B. Femoral nerve"] } },
+            { number: 24, type: "mcq", question: { en: "24. Which nerve arises from L2–L4 and exits medially from the psoas major to supply the medial compartment of the thigh?" }, options: { en: ["A. Femoral nerve", "B. Obturator nerve", "C. Lateral femoral cutaneous nerve", "D. Genitofemoral nerve"] }, answer: { en: ["B. Obturator nerve"] } },
+            { number: 25, type: "mcq", question: { en: "25. Which nerve of the lumbar plexus provides sensation to the anterolateral thigh and is commonly involved in meralgia paresthetica?" }, options: { en: ["A. Femoral nerve", "B. Obturator nerve", "C. Lateral femoral cutaneous nerve", "D. Ilioinguinal nerve"] }, answer: { en: ["C. Lateral femoral cutaneous nerve"] } },
+            { number: 26, type: "mcq", question: { en: "26. Which lumbar plexus nerve originates from L1 and supplies the skin of the lower abdominal wall and upper gluteal region?" }, options: { en: ["A. Iliohypogastric nerve", "B. Femoral nerve", "C. Obturator nerve", "D. Genitofemoral nerve"] }, answer: { en: ["A. Iliohypogastric nerve"] } },
+            { number: 27, type: "mcq", question: { en: "27. Which nerve arises from L1 and passes through the inguinal canal to supply the skin of the groin and upper medial thigh?" }, options: { en: ["A. Iliohypogastric nerve", "B. Ilioinguinal nerve", "C. Femoral nerve", "D. Obturator nerve"] }, answer: { en: ["B. Ilioinguinal nerve"] } },
+            { number: 28, type: "mcq", question: { en: "28. Which nerve originates from L1–L2 and divides into genital and femoral branches?" }, options: { en: ["A. Iliohypogastric nerve", "B. Femoral nerve", "C. Genitofemoral nerve", "D. Obturator nerve"] }, answer: { en: ["C. Genitofemoral nerve"] } },
+            { number: 29, type: "mcq", question: { en: "29. The femoral nerve innervates which muscle group primarily responsible for knee extension?" }, options: { en: ["A. Hamstrings", "B. Quadriceps femoris", "C. Adductor group", "D. Gluteal muscles"] }, answer: { en: ["B. Quadriceps femoris"] } },
+            { number: 30, type: "mcq", question: { en: "30. The obturator nerve innervates which muscle group primarily responsible for thigh adduction?" }, options: { en: ["A. Quadriceps", "B. Hamstrings", "C. Adductors", "D. Gluteals"] }, answer: { en: ["C. Adductors"] } },
+            { number: 31, type: "mcq", question: { en: "31. Which nerve provides sensory innervation to the anterior thigh and medial leg via its terminal branch (saphenous nerve)?" }, options: { en: ["A. Obturator nerve", "B. Femoral nerve", "C. Sciatic nerve", "D. Ilioinguinal nerve"] }, answer: { en: ["B. Femoral nerve"] } },
+            { number: 32, type: "mcq", question: { en: "32. Which lumbar plexus nerve is most likely injured during pelvic surgery affecting thigh adduction?" }, options: { en: ["A. Femoral nerve", "B. Obturator nerve", "C. Sciatic nerve", "D. Genitofemoral nerve"] }, answer: { en: ["B. Obturator nerve"] } },
+            { number: 33, type: "mcq", question: { en: "33. Which nerve of the lumbar plexus travels lateral to the psoas major and crosses the iliacus muscle?" }, options: { en: ["A. Obturator nerve", "B. Femoral nerve", "C. Genitofemoral nerve", "D. Iliohypogastric nerve"] }, answer: { en: ["B. Femoral nerve"] } },
+            { number: 34, type: "mcq", question: { en: "34. Which nerve of the lumbar plexus runs on the anterior surface of the psoas major?" }, options: { en: ["A. Femoral nerve", "B. Obturator nerve", "C. Genitofemoral nerve", "D. Iliohypogastric nerve"] }, answer: { en: ["C. Genitofemoral nerve"] } },
+            { number: 35, type: "mcq", question: { en: "35. Which nerve of the lumbar plexus is purely sensory?" }, options: { en: ["A. Femoral nerve", "B. Obturator nerve", "C. Lateral femoral cutaneous nerve", "D. Genitofemoral nerve"] }, answer: { en: ["C. Lateral femoral cutaneous nerve"] } },
+            { number: 36, type: "mcq", question: { en: "36. Which spinal nerve contributes to both the lumbar and sacral plexuses via the lumbosacral trunk?" }, options: { en: ["A. L3", "B. L4", "C. L5", "D. S1"] }, answer: { en: ["C. L5"] } },
+            { number: 37, type: "mcq", question: { en: "37. Which structure marks the inferior boundary of the lumbar plexus region as it transitions into the sacral plexus?" }, options: { en: ["A. Iliac crest", "B. Pelvic brim", "C. Lumbosacral trunk", "D. Sacral promontory"] }, answer: { en: ["C. Lumbosacral trunk"] } },
+            { number: 38, type: "mcq", question: { en: "38. Which lumbar plexus nerve provides motor innervation to the iliacus muscle?" }, options: { en: ["A. Obturator nerve", "B. Femoral nerve", "C. Sciatic nerve", "D. Iliohypogastric nerve"] }, answer: { en: ["B. Femoral nerve"] } },
+            { number: 39, type: "mcq", question: { en: "39. Which nerve supplies sensation to the medial aspect of the thigh?" }, options: { en: ["A. Femoral nerve", "B. Obturator nerve", "C. Lateral femoral cutaneous nerve", "D. Ilioinguinal nerve"] }, answer: { en: ["B. Obturator nerve"] } },
+            { number: 40, type: "mcq", question: { en: "40. Which lumbar plexus nerve is most likely affected in a patient presenting with loss of knee extension and reduced patellar reflex?" }, options: { en: ["A. Obturator nerve", "B. Femoral nerve", "C. Sciatic nerve", "D. Genitofemoral nerve"] }, answer: { en: ["B. Femoral nerve"] } },
+            { number: 41, type: "mcq", question: { en: "41. The sacral plexus is formed by the lumbosacral trunk and anterior rami of specific sacral spinal nerves. Which spinal levels contribute to its formation?" }, options: { en: ["A. L2–L5", "B. L4–S4", "C. L5–S5", "D. S1–S5"] }, answer: { en: ["B. L4–S4"] } },
+            { number: 42, type: "mcq", question: { en: "42. The sacral plexus is located on the posterior pelvic wall. Which muscle lies anterior to the plexus?" }, options: { en: ["A. Iliacus", "B. Psoas major", "C. Piriformis", "D. Quadratus lumborum"] }, answer: { en: ["C. Piriformis"] } },
+            { number: 43, type: "mcq", question: { en: "43. Which is the largest nerve of the sacral plexus and the body?" }, options: { en: ["A. Femoral nerve", "B. Obturator nerve", "C. Sciatic nerve", "D. Pudendal nerve"] }, answer: { en: ["C. Sciatic nerve"] } },
+            { number: 44, type: "mcq", question: { en: "44. The sciatic nerve is composed of two major components. Which nerves form it?" }, options: { en: ["A. Femoral and obturator", "B. Tibial and common fibular (peroneal)", "C. Pudendal and gluteal", "D. Superior and inferior gluteal"] }, answer: { en: ["B. Tibial and common fibular (peroneal)"] } },
+            { number: 45, type: "mcq", question: { en: "45. Which part of the sciatic nerve supplies the posterior compartment of the thigh?" }, options: { en: ["A. Common fibular nerve", "B. Tibial nerve", "C. Femoral nerve", "D. Obturator nerve"] }, answer: { en: ["B. Tibial nerve"] } },
+            { number: 46, type: "mcq", question: { en: "46. Which branch of the sacral plexus supplies the gluteus medius and minimus muscles?" }, options: { en: ["A. Inferior gluteal nerve", "B. Superior gluteal nerve", "C. Sciatic nerve", "D. Pudendal nerve"] }, answer: { en: ["B. Superior gluteal nerve"] } },
+            { number: 47, type: "mcq", question: { en: "47. Which nerve supplies the gluteus maximus muscle?" }, options: { en: ["A. Superior gluteal nerve", "B. Inferior gluteal nerve", "C. Sciatic nerve", "D. Pudendal nerve"] }, answer: { en: ["B. Inferior gluteal nerve"] } },
+            { number: 48, type: "mcq", question: { en: "48. Which sacral plexus nerve exits the pelvis through the greater sciatic foramen above the piriformis muscle?" }, options: { en: ["A. Sciatic nerve", "B. Pudendal nerve", "C. Superior gluteal nerve", "D. Inferior gluteal nerve"] }, answer: { en: ["C. Superior gluteal nerve"] } },
+            { number: 49, type: "mcq", question: { en: "49. Which sacral plexus nerve exits the pelvis below the piriformis muscle and re-enters through the lesser sciatic foramen?" }, options: { en: ["A. Sciatic nerve", "B. Pudendal nerve", "C. Superior gluteal nerve", "D. Inferior gluteal nerve"] }, answer: { en: ["B. Pudendal nerve"] } },
+            { number: 50, type: "mcq", question: { en: "50. Which nerve of the sacral plexus provides sensory and motor innervation to the perineum?" }, options: { en: ["A. Sciatic nerve", "B. Pudendal nerve", "C. Inferior gluteal nerve", "D. Superior gluteal nerve"] }, answer: { en: ["B. Pudendal nerve"] } },
+            { number: 51, type: "mcq", question: { en: "51. Which nerve is responsible for dorsiflexion of the foot and is a branch of the sciatic nerve?" }, options: { en: ["A. Tibial nerve", "B. Common fibular nerve", "C. Femoral nerve", "D. Obturator nerve"] }, answer: { en: ["B. Common fibular nerve"] } },
+            { number: 52, type: "mcq", question: { en: "52. Which nerve is responsible for plantarflexion of the foot?" }, options: { en: ["A. Tibial nerve", "B. Common fibular nerve", "C. Femoral nerve", "D. Obturator nerve"] }, answer: { en: ["A. Tibial nerve"] } },
+            { number: 53, type: "mcq", question: { en: "53. Which sacral plexus nerve provides sensation to the posterior thigh and leg?" }, options: { en: ["A. Femoral nerve", "B. Posterior femoral cutaneous nerve", "C. Obturator nerve", "D. Lateral femoral cutaneous nerve"] }, answer: { en: ["B. Posterior femoral cutaneous nerve"] } },
+            { number: 54, type: "mcq", question: { en: "54. Which nerve is most commonly injured in posterior hip dislocation?" }, options: { en: ["A. Femoral nerve", "B. Obturator nerve", "C. Sciatic nerve", "D. Pudendal nerve"] }, answer: { en: ["C. Sciatic nerve"] } },
+            { number: 55, type: "mcq", question: { en: "55. Which sacral plexus nerve contributes to control of urinary and fecal continence?" }, options: { en: ["A. Sciatic nerve", "B. Pudendal nerve", "C. Superior gluteal nerve", "D. Inferior gluteal nerve"] }, answer: { en: ["B. Pudendal nerve"] } },
+            { number: 56, type: "mcq", question: { en: "56. Which nerve arises from L4–S1 and supplies the gluteus medius muscle?" }, options: { en: ["A. Inferior gluteal nerve", "B. Superior gluteal nerve", "C. Sciatic nerve", "D. Pudendal nerve"] }, answer: { en: ["B. Superior gluteal nerve"] } },
+            { number: 57, type: "mcq", question: { en: "57. Which component of the sacral plexus contributes fibers to both lumbar and sacral plexuses?" }, options: { en: ["A. S1", "B. S2", "C. Lumbosacral trunk (L4–L5)", "D. S3"] }, answer: { en: ["C. Lumbosacral trunk (L4–L5)"] } },
+            { number: 58, type: "mcq", question: { en: "58. Which sacral plexus nerve innervates the short lateral rotator muscles of the hip?" }, options: { en: ["A. Sciatic nerve", "B. Nerve to obturator internus", "C. Femoral nerve", "D. Obturator nerve"] }, answer: { en: ["B. Nerve to obturator internus"] } },
+            { number: 59, type: "mcq", question: { en: "59. Which nerve supplies the quadratus femoris muscle?" }, options: { en: ["A. Nerve to quadratus femoris", "B. Sciatic nerve", "C. Femoral nerve", "D. Pudendal nerve"] }, answer: { en: ["A. Nerve to quadratus femoris"] } },
+            { number: 60, type: "mcq", question: { en: "60. Which clinical sign is associated with injury to the common fibular nerve?" }, options: { en: ["A. Loss of plantarflexion", "B. Foot drop", "C. Loss of knee extension", "D. Loss of thigh adduction"] }, answer: { en: ["B. Foot drop"] } }
+        ];
+
+        let quizDataPart8 = [
+            // Reflexes
+            { number: 1, type: "mcq", question: { en: "1. A reflex is defined as an automatic, rapid, and involuntary response of the body to a specific stimulus mediated through a neural pathway known as a reflex arc. Which component of the nervous system is primarily responsible for mediating most simple reflexes?" }, options: { en: ["A. Cerebral cortex", "B. Spinal cord", "C. Cerebellum", "D. Basal ganglia"] }, answer: { en: ["B. Spinal cord"] } },
+            { number: 2, type: "mcq", question: { en: "2. The reflex arc represents the neural pathway responsible for reflex action. Which of the following structures is the correct sequence in a reflex arc?" }, options: { en: ["A. Effector → Motor neuron → Receptor → Sensory neuron → CNS", "B. Receptor → Sensory neuron → Integration center → Motor neuron → Effector", "C. Sensory neuron → Effector → Motor neuron → Receptor → CNS", "D. CNS → Receptor → Motor neuron → Sensory neuron → Effector"] }, answer: { en: ["B. Receptor → Sensory neuron → Integration center → Motor neuron → Effector"] } },
+            { number: 3, type: "mcq", question: { en: "3. The stretch reflex (myotatic reflex) plays an important role in maintaining muscle tone and posture. Which sensory receptor detects muscle stretch in this reflex?" }, options: { en: ["A. Golgi tendon organ", "B. Muscle spindle", "C. Pacinian corpuscle", "D. Free nerve endings"] }, answer: { en: ["B. Muscle spindle"] } },
+            { number: 4, type: "mcq", question: { en: "4. Deep tendon reflexes are commonly used in neurological examination to assess the integrity of spinal cord segments and peripheral nerves. Which spinal segment is associated with the biceps reflex?" }, options: { en: ["A. C1–C2", "B. C5–C6", "C. C7–C8", "D. T1–T2"] }, answer: { en: ["B. C5–C6"] } },
+            { number: 5, type: "mcq", question: { en: "5. Superficial reflexes are elicited by cutaneous stimulation rather than tendon stretch. Which reflex is considered a superficial reflex?" }, options: { en: ["A. Patellar reflex", "B. Biceps reflex", "C. Plantar reflex", "D. Achilles reflex"] }, answer: { en: ["C. Plantar reflex"] } },
+            { number: 6, type: "mcq", question: { en: "6. Hyperreflexia is commonly associated with lesions affecting:" }, options: { en: ["A. Lower motor neurons", "B. Peripheral nerves", "C. Upper motor neurons", "D. Neuromuscular junction"] }, answer: { en: ["C. Upper motor neurons"] } },
+            { number: 7, type: "mcq", question: { en: "7. A 55-year-old man presents with progressive weakness of the right arm and leg after a stroke. Neurological examination reveals increased muscle tone, exaggerated deep tendon reflexes, and a positive Babinski sign on the right side. Which type of neurological lesion most likely explains these findings?" }, options: { en: ["A. Lower motor neuron lesion", "B. Peripheral nerve lesion", "C. Upper motor neuron lesion", "D. Neuromuscular junction disorder"] }, answer: { en: ["C. Upper motor neuron lesion"] } },
+            { number: 8, type: "mcq", question: { en: "8. Loss of deep tendon reflexes may occur in diseases affecting peripheral nerves or anterior horn cells. Which disease commonly presents with areflexia?" }, options: { en: ["A. Parkinson disease", "B. Guillain-Barré syndrome", "C. Multiple sclerosis", "D. Epilepsy"] }, answer: { en: ["B. Guillain-Barré syndrome"] } },
+            { number: 9, type: "mcq", question: { en: "9. A patient with facial trauma undergoes neurological examination. When the cornea is lightly touched with cotton, there is no blinking response in either eye. Which cranial nerves are responsible for the afferent and efferent limbs of this reflex?" }, options: { en: ["A. CN II and CN III", "B. CN V and CN VII", "C. CN VIII and CN IX", "D. CN IX and CN X"] }, answer: { en: ["B. CN V and CN VII"] } },
+            { number: 10, type: "mcq", question: { en: "10. A 45-year-old patient complains of weakness in the left leg. Neurological examination shows decreased muscle tone, muscle atrophy, fasciculations, and absent deep tendon reflexes in the affected limb. Which type of lesion most likely explains these findings?" }, options: { en: ["A. Upper motor neuron lesion", "B. Lower motor neuron lesion", "C. Cerebellar lesion", "D. Cortical lesion"] }, answer: { en: ["B. Lower motor neuron lesion"] } },
+            // Spinal Cord
+            { number: 11, type: "mcq", question: { en: "1. During adult development, the spinal cord does not extend the full length of the vertebral column due to differential growth. As a result, the conus medullaris typically terminates at which vertebral level?" }, options: { en: ["A. T12", "B. L1–L2", "C. L3", "D. S1"] }, answer: { en: ["B. L1–L2"] } },
+            { number: 12, type: "mcq", question: { en: "2. A lumbar puncture is safely performed below the termination of the spinal cord to avoid injury. At which anatomical level is the spinal cord absent, allowing safe CSF access?" }, options: { en: ["A. T12–L1", "B. L1–L2", "C. L3–L4", "D. S1–S2"] }, answer: { en: ["C. L3–L4"] } },
+            { number: 13, type: "mcq", question: { en: "3. A patient presents with loss of vibration and position sense below a lesion. Which ascending tract located in the posterior column is primarily responsible for transmitting these modalities?" }, options: { en: ["A. Spinothalamic tract", "B. Corticospinal tract", "C. Dorsal column–medial lemniscus pathway", "D. Spinoreticular tract"] }, answer: { en: ["C. Dorsal column–medial lemniscus pathway"] } },
+            { number: 14, type: "mcq", question: { en: "4. A lesion affecting the anterior spinal artery would compromise blood supply to which major portion of the spinal cord?" }, options: { en: ["A. Posterior one-third", "B. Lateral column only", "C. Anterior two-thirds", "D. Central canal only"] }, answer: { en: ["C. Anterior two-thirds"] } },
+            { number: 15, type: "mcq", question: { en: "5. A patient demonstrates ipsilateral motor weakness below a spinal cord lesion. Which tract is most likely affected, considering its decussation occurs in the medulla?" }, options: { en: ["A. Spinothalamic", "B. Corticospinal", "C. Spinocerebellar", "D. Vestibulospinal"] }, answer: { en: ["B. Corticospinal"] } },
+            { number: 16, type: "mcq", question: { en: "6. The lateral horn of the spinal cord is particularly prominent in certain segments where autonomic neurons are concentrated. Which spinal levels contain this structure?" }, options: { en: ["A. C1–C4", "B. T1–L2", "C. L3–L5", "D. S2–S4"] }, answer: { en: ["B. T1–L2"] } },
+            { number: 17, type: "mcq", question: { en: "7. A patient with a spinal cord lesion retains pain and temperature sensation but loses proprioception and vibration. Which region of the spinal cord is most likely affected?" }, options: { en: ["A. Anterior column", "B. Lateral column", "C. Posterior column", "D. Central canal"] }, answer: { en: ["C. Posterior column"] } },
+            { number: 18, type: "mcq", question: { en: "8. In spinal cord anatomy, which structure serves as the inferior extension of the pia mater and anchors the cord to the coccyx?" }, options: { en: ["A. Denticulate ligament", "B. Filum terminale", "C. Ligamentum flavum", "D. Posterior longitudinal ligament"] }, answer: { en: ["B. Filum terminale"] } },
+            { number: 19, type: "mcq", question: { en: "9. A lesion affecting fibers that cross immediately within 1–2 spinal segments would impair which sensory modality?" }, options: { en: ["A. Proprioception", "B. Vibration", "C. Pain and temperature", "D. Fine touch"] }, answer: { en: ["C. Pain and temperature"] } },
+            { number: 20, type: "mcq", question: { en: "10. A spinal cord lesion leads to impaired unconscious proprioception without affecting conscious position sense. Which tract is involved?" }, options: { en: ["A. Dorsal column", "B. Spinothalamic", "C. Spinocerebellar", "D. Corticospinal"] }, answer: { en: ["C. Spinocerebellar"] } },
+            { number: 21, type: "mcq", question: { en: "11. The denticulate ligaments play a key role in stabilizing the spinal cord. Between which meningeal layers are they located?" }, options: { en: ["A. Dura and bone", "B. Pia and dura", "C. Arachnoid and dura", "D. Pia and arachnoid"] }, answer: { en: ["B. Pia and dura"] } },
+            { number: 22, type: "mcq", question: { en: "12. A patient has a lesion at the cervical enlargement. Which functional deficit is most likely observed?" }, options: { en: ["A. Loss of trunk movement", "B. Upper limb weakness", "C. Lower limb paralysis only", "D. Respiratory arrest"] }, answer: { en: ["B. Upper limb weakness"] } },
+            { number: 23, type: "mcq", question: { en: "13. The artery of Adamkiewicz plays a critical role in spinal cord vascularization. Which region does it primarily supply?" }, options: { en: ["A. Cervical cord", "B. Upper thoracic cord", "C. Lower thoracic and lumbar cord", "D. Sacral cord only"] }, answer: { en: ["C. Lower thoracic and lumbar cord"] } },
+            { number: 24, type: "mcq", question: { en: "14. A lesion affecting the anterior horn of the spinal cord would result in which type of neurological deficit?" }, options: { en: ["A. Sensory loss", "B. Upper motor neuron signs", "C. Lower motor neuron weakness", "D. Autonomic dysfunction"] }, answer: { en: ["C. Lower motor neuron weakness"] } },
+            { number: 25, type: "mcq", question: { en: "15. Which spinal cord region contains the least amount of white matter due to fewer ascending and descending fibers?" }, options: { en: ["A. Cervical", "B. Thoracic", "C. Lumbar", "D. Sacral"] }, answer: { en: ["D. Sacral"] } },
+            { number: 26, type: "mcq", question: { en: "16. A lesion affecting the dorsal root ganglion would primarily disrupt which function?" }, options: { en: ["A. Motor output", "B. Autonomic output", "C. Sensory input", "D. Reflex coordination"] }, answer: { en: ["C. Sensory input"] } },
+            { number: 27, type: "mcq", question: { en: "17. Which anatomical feature allows spinal nerves to exit the vertebral column?" }, options: { en: ["A. Vertebral canal", "B. Intervertebral foramen", "C. Lamine", "D. Spinous process"] }, answer: { en: ["B. Intervertebral foramen"] } },
+            { number: 28, type: "mcq", question: { en: "18. A patient presents with loss of voluntary motor control below a lesion. Which descending tract is primarily involved?" }, options: { en: ["A. Spinothalamic", "B. Corticospinal", "C. Spinocerebellar", "D. Dorsal column"] }, answer: { en: ["B. Corticospinal"] } },
+            { number: 29, type: "mcq", question: { en: "19. Which structure connects the two halves of the spinal cord gray matter and contains the central canal?" }, options: { en: ["A. White commissure", "B. Gray commissure", "C. Posterior column", "D. Lateral horn"] }, answer: { en: ["B. Gray commissure"] } },
+            { number: 30, type: "mcq", question: { en: "20. A lesion affecting the posterior spinal arteries would most likely impair which function?" }, options: { en: ["A. Motor function", "B. Pain sensation", "C. Proprioception", "D. Autonomic function"] }, answer: { en: ["C. Proprioception"] } },
+            { number: 31, type: "mcq", question: { en: "21. A patient demonstrates contralateral loss of pain and temperature below a spinal lesion. Which tract is involved?" }, options: { en: ["A. Corticospinal", "B. Dorsal column", "C. Spinothalamic", "D. Vestibulospinal"] }, answer: { en: ["C. Spinothalamic"] } },
+            { number: 32, type: "mcq", question: { en: "22. Which region of the spinal cord is most susceptible to ischemic injury due to its vascular supply?" }, options: { en: ["A. Posterior column", "B. Central canal", "C. Anterior two-thirds", "D. Lateral horn"] }, answer: { en: ["C. Anterior two-thirds"] } },
+            { number: 33, type: "mcq", question: { en: "23. A patient with damage to the spinocerebellar tract would most likely exhibit which deficit?" }, options: { en: ["A. Loss of voluntary movement", "B. Loss of pain sensation", "C. Ataxia", "D. Paralysis"] }, answer: { en: ["C. Ataxia"] } },
+            { number: 34, type: "mcq", question: { en: "24. Which meningeal layer directly covers the spinal cord and follows its contours closely?" }, options: { en: ["A. Dura mater", "B. Arachnoid mater", "C. Pia mater", "D. Epidural layer"] }, answer: { en: ["C. Pia mater"] } },
+            { number: 35, type: "mcq", question: { en: "25. Which spinal cord segment is associated with parasympathetic outflow to pelvic organs?" }, options: { en: ["A. T1–T4", "B. T5–T10", "C. L1–L2", "D. S2–S4"] }, answer: { en: ["D. S2–S4"] } },
+            { number: 36, type: "mcq", question: { en: "26. A lesion in the thoracic spinal cord would most likely spare which function?" }, options: { en: ["A. Trunk movement", "B. Lower limb movement", "C. Upper limb movement", "D. Autonomic function"] }, answer: { en: ["C. Upper limb movement"] } },
+            { number: 37, type: "mcq", question: { en: "27. Which tract is responsible for transmitting crude touch and pressure sensations?" }, options: { en: ["A. Dorsal column", "B. Spinothalamic", "C. Corticospinal", "D. Spinocerebellar"] }, answer: { en: ["B. Spinothalamic"] } },
+            { number: 38, type: "mcq", question: { en: "28. Which spinal cord structure is located centrally and contains cerebrospinal fluid?" }, options: { en: ["A. Gray horn", "B. Central canal", "C. Posterior column", "D. Lateral horn"] }, answer: { en: ["B. Central canal"] } },
+            { number: 39, type: "mcq", question: { en: "29. A lesion affecting the corticospinal tract above its decussation would produce which deficit?" }, options: { en: ["A. Ipsilateral paralysis", "B. Contralateral paralysis", "C. Bilateral paralysis", "D. No deficit"] }, answer: { en: ["B. Contralateral paralysis"] } },
+            { number: 40, type: "mcq", question: { en: "30. Which anatomical feature explains why lumbar nerve roots travel downward before exiting the vertebral column?" }, options: { en: ["A. Short spinal cord", "B. Growth mismatch between cord and vertebrae", "C. Thick dura mater", "D. Narrow spinal canal"] }, answer: { en: ["B. Growth mismatch between cord and vertebrae"] } },
+            { number: 41, type: "mcq", question: { en: "31. A patient presents with urinary retention, decreased anal tone, and bilateral lower limb weakness after trauma. Which spinal levels are most likely involved?" }, options: { en: ["A. C1–C4", "B. T1–T6", "C. L2–S5 nerve roots", "D. T12–L1 cord"] }, answer: { en: ["C. L2–S5 nerve roots"] } },
+            { number: 42, type: "mcq", question: { en: "32. A patient presents with progressive lower limb weakness and sensory loss, but upper limbs are normal. MRI shows a lesion at T10. Which function is most likely preserved?" }, options: { en: ["A. Lower limb movement", "B. Upper limb movement", "C. Autonomic function", "D. Pain sensation"] }, answer: { en: ["B. Upper limb movement"] } },
+            { number: 43, type: "mcq", question: { en: "33. A patient presents with ataxia without loss of conscious proprioception. Which tract is likely affected?" }, options: { en: ["A. Dorsal column", "B. Spinothalamic", "C. Spinocerebellar", "D. Corticospinal"] }, answer: { en: ["C. Spinocerebellar"] } },
+            { number: 44, type: "mcq", question: { en: "34. A patient presents with sudden loss of pain and temperature on the left side of the body starting two levels below a right-sided spinal lesion. Which tract is affected?" }, options: { en: ["A. Corticospinal tract", "B. Dorsal column", "C. Spinothalamic tract", "D. Spinocerebellar tract"] }, answer: { en: ["C. Spinothalamic tract"] } },
+            { number: 45, type: "mcq", question: { en: "35. A spinal cord injury disrupts fibers responsible for crude touch and pressure sensation. Which tract is involved?" }, options: { en: ["A. Dorsal column", "B. Spinothalamic tract", "C. Corticospinal tract", "D. Spinocerebellar tract"] }, answer: { en: ["B. Spinothalamic tract"] } },
+            { number: 46, type: "mcq", question: { en: "36. A patient presents with damage to the dorsal root ganglion. Which function is primarily affected?" }, options: { en: ["A. Motor output", "B. Sensory input", "C. Autonomic function", "D. Reflex output"] }, answer: { en: ["B. Sensory input"] } },
+            { number: 47, type: "mcq", question: { en: "37. Which spinal cord tract demonstrates somatotopic organization such that fibers from lower body regions are located more medially in the dorsal columns?" }, options: { en: ["A. Spinothalamic tract", "B. Corticospinal tract", "C. Fasciculus gracilis", "D. Fasciculus cuneatus"] }, answer: { en: ["C. Fasciculus gracilis"] } },
+            { number: 48, type: "mcq", question: { en: "38. Which spinal cord tract demonstrates somatotopic organization such that fibers from lower body regions are located more medially in the dorsal columns? (Repeat)" }, options: { en: ["A. Spinothalamic tract", "B. Corticospinal tract", "C. Fasciculus gracilis", "D. Fasciculus cuneatus"] }, answer: { en: ["C. Fasciculus gracilis"] } },
+            { number: 49, type: "mcq", question: { en: "39. Which descending tract originates in the motor cortex, descends through the brainstem, and decussates at the pyramidal decussation in the medulla?" }, options: { en: ["A. Spinothalamic", "B. Dorsal column", "C. Corticospinal", "D. Spinocerebellar"] }, answer: { en: ["C. Corticospinal"] } },
+            { number: 50, type: "mcq", question: { en: "40. Within the dorsal column–medial lemniscus system, which fasciculus carries sensory information from the lower half of the body and is positioned medially in the posterior column throughout the spinal cord?" }, options: { en: ["A. Fasciculus cuneatus", "B. Fasciculus gracilis", "C. Spinothalamic tract", "D. Spinocerebellar tract"] }, answer: { en: ["B. Fasciculus gracilis"] } }
+        ];
+
+        let quizData;
+        let currentPart = 1;
+        let quizState = {};
+
+        // Sound Synthesis
+        const correctSynth = new Tone.Synth().toDestination();
+        const incorrectSynth = new Tone.Synth().toDestination();
+        let audioStarted = false;
+
+        // DOM Elements
+        const partButtons = [
+            document.getElementById('part1-btn'),
+            document.getElementById('part2-btn'),
+            document.getElementById('part3-btn'),
+            document.getElementById('part4-btn'),
+            document.getElementById('part5-btn'),
+            document.getElementById('part6-btn'),
+            document.getElementById('part7-btn'),
+            document.getElementById('part8-btn')
+        ];
+        
+        const quizView = document.getElementById('quiz-view');
+        const editView = document.getElementById('edit-view');
+        const practiceSheetBtn = document.getElementById('practice-sheet-btn');
+        const practiceSheetView = document.getElementById('practice-sheet-view');
+        const showAllBtn = document.getElementById('show-all-btn');
+        const allQuestionsView = document.getElementById('all-questions-view');
+        const editQuizBtn = document.getElementById('edit-quiz-btn');
+        const applyPreviewBtn = document.getElementById('apply-preview-btn');
+        const generateSaveCodeBtn = document.getElementById('generate-save-code-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const addQuestionBtn = document.getElementById('add-question-btn');
+        const editQuestionsContainer = document.getElementById('edit-questions-container');
+        const editQuestionNavArea = document.getElementById('edit-question-navigation');
+        const exportArea = document.getElementById('export-area');
+        const exportOutput = document.getElementById('export-output');
+        const copyFeedbackEl = document.getElementById('copy-feedback');
+
+        const mainScoreTextEl = document.getElementById('main-score-text');
+        const questionNavArea = document.getElementById('question-navigation');
+        const questionArea = document.getElementById('question-area');
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const answerArea = document.getElementById('answer-area');
+        const feedbackArea = document.getElementById('feedback-area');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const redoBtn = document.getElementById('redo-btn');
+        const redoPartBtn = document.getElementById('redo-part-btn');
+        const resultsArea = document.getElementById('results-area');
+        const resultsScoreEl = document.getElementById('results-score');
+        const summaryEl = document.getElementById('summary');
+        const restartBtn = document.getElementById('restart-btn');
+
+        let isAnswered = false;
+
+        async function startAudio() {
+            if (!audioStarted) {
+                await Tone.start();
+                audioStarted = true;
+            }
+        }
+        
+        function switchPart(part) {
+            currentPart = part;
+
+            partButtons.forEach((btn, idx) => {
+                if (idx === part - 1) {
+                    btn.classList.add('bg-indigo-600', 'text-white');
+                    btn.classList.remove('bg-white', 'text-gray-900');
+                } else {
+                    btn.classList.remove('bg-indigo-600', 'text-white');
+                    btn.classList.add('bg-white', 'text-gray-900');
+                }
+            });
+            
+            const datasets = [quizDataPart1, quizDataPart2, quizDataPart3, quizDataPart4, quizDataPart5, quizDataPart6, quizDataPart7, quizDataPart8];
+            quizData = datasets[part-1];
+            
+            document.getElementById('quiz-subtitle').textContent = `Subject: Neuroscience (${quizData.length} questions)`;
+            loadQuizView();
+        }
+
+        function updateScoreText() {
+            mainScoreTextEl.innerHTML = `Score: ${quizState[currentPart].score} / ${quizData.length}`;
+        }
+
+        function initializeQuiz() {
+            quizState = {};
+            for(let i=1; i<=8; i++) {
+                quizState[i] = { userAnswers: [], score: 0, currentQuestionIndex: 0 };
+            }
+            switchPart(currentPart); 
+        }
+        
+        function loadQuizView() {
+            quizView.classList.remove('hidden');
+            editView.classList.add('hidden');
+            practiceSheetView.classList.add('hidden');
+            allQuestionsView.classList.add('hidden');
+            
+            questionNavArea.classList.remove('hidden');
+            questionArea.classList.remove('hidden');
+            answerArea.classList.remove('hidden');
+            resultsArea.classList.add('hidden');
+
+            renderQuestionButtons();
+            showQuestion();
+            updateScoreText();
+        }
+
+        function renderQuestionButtons() {
+            questionNavArea.innerHTML = '';
+            quizData.forEach((question, index) => {
+                const button = document.createElement('button');
+                button.textContent = index + 1;
+                button.classList.add('question-nav-btn', 'border-2', 'border-gray-300', 'rounded-md');
+                button.addEventListener('click', () => {
+                    quizState[currentPart].currentQuestionIndex = index;
+                    showQuestion();
+                });
+                questionNavArea.appendChild(button);
+            });
+        }
+        
+        function updateQuestionButtonStyles() {
+            const buttons = Array.from(questionNavArea.children);
+            buttons.forEach((button, index) => {
+                button.classList.remove('active', 'answered-correct', 'answered-incorrect');
+                if (quizState[currentPart].userAnswers[index]) {
+                    if(quizState[currentPart].userAnswers[index].isCorrect) {
+                        button.classList.add('answered-correct');
+                    } else {
+                        button.classList.add('answered-incorrect');
+                    }
+                }
+            });
+            const currentQuestionIndex = quizState[currentPart].currentQuestionIndex;
+            if(buttons[currentQuestionIndex]) {
+                buttons[currentQuestionIndex].classList.add('active');
+            }
+        }
+
+        function showQuestion() {
+            resetState();
+            const currentQuestionIndex = quizState[currentPart].currentQuestionIndex;
+            const userAnswers = quizState[currentPart].userAnswers;
+            const currentQuestion = quizData[currentQuestionIndex];
+            isAnswered = userAnswers[currentQuestionIndex] !== undefined;
+
+            if (isAnswered) redoBtn.classList.remove('hidden');
+
+            questionNumberEl.innerHTML = `Question ${currentQuestionIndex + 1}/${quizData.length}`;
+            questionTextEl.innerHTML = currentQuestion.question.en;
+            
+            answerArea.className = 'flex flex-col gap-4';
+            const optionsGrid = document.createElement('div');
+            optionsGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4 w-full';
+            
+            const correctAnswers = Array.isArray(currentQuestion.answer.en) ? currentQuestion.answer.en.map(a=>a.trim()) : [currentQuestion.answer.en.trim()];
+            
+            currentQuestion.options.en.forEach((optionEn) => {
+                const button = document.createElement('button');
+                button.innerHTML = `<span>${optionEn}</span>`;
+                button.classList.add('option-btn', 'w-full', 'p-4', 'border-2', 'border-gray-300', 'rounded-lg', 'text-left', 'hover:bg-gray-100');
+                
+                button.addEventListener('click', () => {
+                    if (isAnswered) return;
+                    button.classList.toggle('selected');
+                    const selectedButtons = Array.from(optionsGrid.querySelectorAll('button.selected'));
+                    if (selectedButtons.length === correctAnswers.length) {
+                        checkMcqAnswer(currentQuestionIndex, optionsGrid, feedbackArea);
+                    }
+                });
+
+                if(isAnswered) {
+                    button.disabled = true;
+                    const userAnswerData = userAnswers[currentQuestionIndex];
+                    const isThisCorrectOption = correctAnswers.includes(optionEn.trim());
+                    const wasSelected = userAnswerData.answers && userAnswerData.answers.includes(optionEn.trim());
+                    if (isThisCorrectOption) button.classList.add('correct');
+                    else if (wasSelected) button.classList.add('incorrect');
+                }
+                optionsGrid.appendChild(button);
+            });
+            answerArea.appendChild(optionsGrid);
+            updateQuestionButtonStyles();
+            updateButtonVisibility();
+        }
+        
+        function resetState() {
+            feedbackArea.textContent = '';
+            answerArea.innerHTML = '';
+            redoBtn.classList.add('hidden');
+        }
+
+        function updateButtonVisibility() {
+            const currentQuestionIndex = quizState[currentPart].currentQuestionIndex;
+            prevBtn.classList.toggle('hidden', currentQuestionIndex === 0);
+            const allAnswered = quizState[currentPart].userAnswers.filter(Boolean).length === quizData.length;
+            nextBtn.classList.toggle('hidden', allAnswered);
+            if (currentQuestionIndex === quizData.length - 1 || allAnswered) {
+                 nextBtn.innerHTML = `<span class="font-semibold">Show Results</span>`;
+            } else {
+                 nextBtn.innerHTML = `<span class="font-semibold">Next Question</span>`;
+            }
+        }
+
+        async function checkMcqAnswer(questionIndex, optionsContainer, feedbackEl) {
+            await startAudio();
+            if (quizState[currentPart].userAnswers[questionIndex]) return;
+
+            const selectedButtons = Array.from(optionsContainer.querySelectorAll('button.selected'));
+            const selectedTexts = selectedButtons.map(btn => btn.querySelector('span').textContent.trim());
+            const currentQuestion = quizData[questionIndex];
+            const correctAnswers = Array.isArray(currentQuestion.answer.en) ? currentQuestion.answer.en.map(a => a.trim()) : [currentQuestion.answer.en.trim()];
+
+            const isCorrect = selectedTexts.length === correctAnswers.length && selectedTexts.every(val => correctAnswers.includes(val));
+
+            if (isCorrect) {
+                quizState[currentPart].score++;
+                correctSynth.triggerAttackRelease("C5", "8n", Tone.now());
+                if (feedbackEl) {
+                    feedbackEl.innerHTML = `Correct!`;
+                    feedbackEl.className = 'mt-2 text-center text-md font-medium text-green-600 practice-feedback';
+                }
+            } else {
+                const now = Tone.now();
+                incorrectSynth.triggerAttackRelease("G3", "16n", now);
+                incorrectSynth.triggerAttackRelease("F#3", "8n", now + 0.1);
+                if (feedbackEl) {
+                    feedbackEl.innerHTML = `Wrong! Correct answer: <strong>${correctAnswers.join(', ')}</strong>`;
+                    feedbackEl.className = 'mt-2 text-center text-sm font-medium text-red-600 practice-feedback';
+                }
+            }
+
+            const allButtons = optionsContainer.querySelectorAll('button.option-btn');
+            allButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('selected', 'hover:bg-gray-100');
+                const btnText = btn.querySelector('span').textContent.trim();
+                if (correctAnswers.includes(btnText)) btn.classList.add('correct');
+                else if (selectedTexts.includes(btnText)) btn.classList.add('incorrect');
+            });
+
+            quizState[currentPart].userAnswers[questionIndex] = { isCorrect, answers: selectedTexts };
+            if (!practiceSheetView.classList.contains('hidden')) {
+                document.getElementById(`ps-redo-btn-${questionIndex}`).classList.remove('hidden');
+            } else redoBtn.classList.remove('hidden');
+            
+            updateScoreText();
+            updateQuestionButtonStyles();
+            updateButtonVisibility();
+        }
+        
+        function renderPracticeSheet() {
+            practiceSheetView.innerHTML = ''; 
+            const title = document.createElement('h2');
+            title.className = 'text-3xl font-bold text-center mb-6 text-gray-800';
+            title.textContent = `Practice Sheet - Part ${currentPart}`;
+            practiceSheetView.appendChild(title);
+
+            quizData.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.id = `ps-question-${index}`;
+                questionDiv.className = 'mb-6 p-4 border rounded-lg bg-gray-50';
+                
+                const questionHeader = document.createElement('div');
+                questionHeader.className = 'flex justify-between items-start gap-4 mb-4';
+                
+                const questionTitle = document.createElement('p');
+                questionTitle.className = 'font-bold text-lg text-gray-900 flex-grow'; // Explicit text-gray-900 for visibility
+                questionTitle.innerHTML = q.question.en;
+                
+                const prRedoBtn = document.createElement('button');
+                prRedoBtn.id = `ps-redo-btn-${index}`;
+                prRedoBtn.textContent = 'Redo';
+                prRedoBtn.className = 'hidden bg-yellow-500 text-white font-bold py-1 px-4 rounded-lg hover:bg-yellow-600 text-sm shrink-0';
+                prRedoBtn.addEventListener('click', () => redoPracticeSheetQuestion(index));
+                
+                questionHeader.appendChild(questionTitle);
+                questionHeader.appendChild(prRedoBtn);
+                questionDiv.appendChild(questionHeader);
+
+                const answersContainer = document.createElement('div');
+                const feedbackEl = document.createElement('div');
+                feedbackEl.className = 'practice-feedback mt-2';
+
+                const optionsGrid = document.createElement('div');
+                optionsGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-3';
+                const correctAnswers = Array.isArray(q.answer.en) ? q.answer.en.map(a=>a.trim()) : [q.answer.en.trim()];
+
+                q.options.en.forEach(optionEn => {
+                    const button = document.createElement('button');
+                    button.innerHTML = `<span>${optionEn}</span>`;
+                    button.className = 'option-btn w-full p-3 border-2 border-gray-300 rounded-lg text-left hover:bg-gray-100 bg-white';
+                    button.addEventListener('click', () => {
+                        if (!quizState[currentPart].userAnswers[index]) {
+                            button.classList.toggle('selected');
+                            const selectedButtons = Array.from(optionsGrid.querySelectorAll('button.selected'));
+                            if (selectedButtons.length === correctAnswers.length) checkMcqAnswer(index, optionsGrid, feedbackEl);
+                        }
+                    });
+                    optionsGrid.appendChild(button);
+                });
+                
+                answersContainer.appendChild(optionsGrid);
+                questionDiv.appendChild(answersContainer);
+                questionDiv.appendChild(feedbackEl);
+                practiceSheetView.appendChild(questionDiv);
+
+                if (quizState[currentPart].userAnswers[index]) {
+                    prRedoBtn.classList.remove('hidden');
+                    const userAnswerData = quizState[currentPart].userAnswers[index];
+                    const buttons = optionsGrid.querySelectorAll('.option-btn');
+                    buttons.forEach(button => {
+                        button.disabled = true;
+                        button.classList.remove('selected', 'hover:bg-gray-100');
+                        const optionText = button.querySelector('span').textContent.trim();
+                        if (correctAnswers.includes(optionText)) button.classList.add('correct');
+                        else if (userAnswerData.answers && userAnswerData.answers.includes(optionText)) button.classList.add('incorrect');
+                    });
+                }
+            });
+            
+            const backBtn = document.createElement('button');
+            backBtn.className = 'mt-8 bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-lg block mx-auto';
+            backBtn.innerHTML = '<span class="font-semibold">Back to Quiz</span>';
+            backBtn.addEventListener('click', togglePracticeSheetView);
+            practiceSheetView.appendChild(backBtn);
+        }
+
+        function togglePracticeSheetView() {
+            const isHiding = !practiceSheetView.classList.contains('hidden');
+            if (isHiding) {
+                practiceSheetView.classList.add('hidden');
+                quizView.classList.remove('hidden');
+                practiceSheetBtn.textContent = 'Practice Sheet';
+                showQuestion();
+            } else {
+                quizView.classList.add('hidden');
+                practiceSheetView.classList.remove('hidden');
+                allQuestionsView.classList.add('hidden');
+                practiceSheetBtn.textContent = 'Back to Quiz';
+                renderPracticeSheet();
+            }
+        }
+
+        function redoPracticeSheetQuestion(questionIndex) {
+            const answerData = quizState[currentPart].userAnswers[questionIndex];
+            if (!answerData) return;
+            if (answerData.isCorrect) quizState[currentPart].score--;
+            quizState[currentPart].userAnswers[questionIndex] = undefined;
+            updateScoreText();
+            updateQuestionButtonStyles();
+            const container = document.getElementById(`ps-question-${questionIndex}`);
+            const buttons = container.querySelectorAll('.option-btn');
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('correct', 'incorrect', 'selected');
+                btn.classList.add('hover:bg-gray-100');
+            });
+            container.querySelector('.practice-feedback').innerHTML = '';
+            document.getElementById(`ps-redo-btn-${questionIndex}`).classList.add('hidden');
+        }
+
+        function toggleAllQuestionsView() {
+            const isHiding = !allQuestionsView.classList.contains('hidden');
+            if (isHiding) {
+                allQuestionsView.classList.add('hidden');
+                quizView.classList.remove('hidden');
+                showAllBtn.textContent = 'Show Answers';
+            } else {
+                quizView.classList.add('hidden');
+                practiceSheetView.classList.add('hidden');
+                allQuestionsView.classList.remove('hidden');
+                showAllBtn.textContent = 'Back to Quiz';
+                renderAllQuestions();
+            }
+        }
+
+        function renderAllQuestions() {
+            allQuestionsView.innerHTML = ''; 
+            const title = document.createElement('h2');
+            title.className = 'text-3xl font-bold text-center mb-6 text-gray-800';
+            title.textContent = `All Questions & Answers - Part ${currentPart}`;
+            allQuestionsView.appendChild(title);
+
+            quizData.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'mb-6 p-4 border rounded-lg bg-gray-50';
+                let contentHTML = `<p class="font-bold text-lg mb-2">${q.question.en}</p>`;
+                contentHTML += '<ul class="list-disc list-inside space-y-1">';
+                const correctAnswers = Array.isArray(q.answer.en) ? q.answer.en.map(a=>a.trim()) : [q.answer.en.trim()];
+                q.options.en.forEach(option => {
+                    const isCorrect = correctAnswers.includes(option.trim());
+                    contentHTML += `<li class="${isCorrect ? 'text-green-700 font-semibold' : 'text-gray-700'}">${option}${isCorrect ? ' &check;' : ''}</li>`;
+                });
+                contentHTML += '</ul>';
+                questionDiv.innerHTML = contentHTML;
+                allQuestionsView.appendChild(questionDiv);
+            });
+            
+            const backBtn = document.createElement('button');
+            backBtn.className = 'mt-8 bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-lg block mx-auto';
+            backBtn.innerHTML = 'Back to Quiz';
+            backBtn.addEventListener('click', toggleAllQuestionsView);
+            allQuestionsView.appendChild(backBtn);
+        }
+
+        function showResults() {
+            questionNavArea.classList.add('hidden');
+            questionArea.classList.add('hidden');
+            answerArea.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            prevBtn.classList.add('hidden');
+            redoBtn.classList.add('hidden');
+            resultsArea.classList.remove('hidden');
+            resultsScoreEl.innerHTML = `Your final score is ${quizState[currentPart].score} out of ${quizData.length}.`;
+            summaryEl.innerHTML = `<div class="text-center mb-4"><h3 class="text-xl font-bold text-gray-700">Review Your Answers:</h3></div>`; 
+            
+            quizState[currentPart].userAnswers.forEach((ua, index) => {
+                if (!ua) return;
+                const qData = quizData[index];
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('mb-4', 'p-3', 'rounded-md', ua.isCorrect ? 'bg-blue-100' : 'bg-red-100');
+                const correctAnswerText = Array.isArray(qData.answer.en) ? qData.answer.en.join(', ') : qData.answer.en;
+                resultDiv.innerHTML = `<p class="font-semibold">${qData.question.en}</p>
+                    <p class="text-sm mt-2 ${ua.isCorrect ? 'text-blue-700' : 'text-red-700'}">Your answer: ${ua.answers.join(', ')}</p>
+                    ${!ua.isCorrect ? `<p class="text-sm text-gray-600">Correct: ${correctAnswerText}</p>` : ''}`;
+                summaryEl.appendChild(resultDiv);
+            });
+        }
+
+        function redoQuestion() {
+            const currentQuestionIndex = quizState[currentPart].currentQuestionIndex;
+            const answerData = quizState[currentPart].userAnswers[currentQuestionIndex];
+            if (!answerData) return;
+            if (answerData.isCorrect) quizState[currentPart].score--;
+            quizState[currentPart].userAnswers[currentQuestionIndex] = undefined;
+            updateScoreText();
+            showQuestion();
+        }
+
+        function redoPart() {
+            quizState[currentPart] = { userAnswers: [], score: 0, currentQuestionIndex: 0 };
+            loadQuizView();
+        }
+
+        function toggleEditMode() {
+            quizView.classList.toggle('hidden');
+            editView.classList.toggle('hidden');
+            if (!editView.classList.contains('hidden')) renderEditView();
+        }
+
+        function renderEditView() {
+            editQuestionsContainer.innerHTML = '';
+            editQuestionNavArea.innerHTML = '';
+            quizData.forEach((q, index) => {
+                const navButton = document.createElement('button');
+                navButton.textContent = index + 1;
+                navButton.className = 'question-nav-btn border-2 border-gray-300 rounded-md';
+                navButton.addEventListener('click', () => document.getElementById(`edit-q-${index}`).scrollIntoView({ behavior: 'smooth' }));
+                editQuestionNavArea.appendChild(navButton);
+                
+                const qDiv = document.createElement('div');
+                qDiv.id = `edit-q-${index}`;
+                qDiv.className = 'border p-4 rounded-lg mb-4 bg-gray-50 scroll-mt-4';
+                qDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="font-bold">Question ${index + 1}</p>
+                        <button class="bg-red-500 text-white px-3 py-1 rounded" onclick="quizData.splice(${index}, 1); renderEditView();">Delete</button>
+                    </div>
+                    <textarea class="edit-input w-full p-2 border rounded" id="edit-text-${index}">${q.question.en}</textarea>
+                    <div class="mt-2 space-y-2">
+                        ${q.options.en.map((opt, oIdx) => `
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="check-${index}-${oIdx}" ${q.answer.en.includes(opt) ? 'checked' : ''}>
+                                <input type="text" class="w-full p-1 border rounded" id="opt-${index}-${oIdx}" value="${opt}">
+                            </div>
+                        `).join('')}
+                    </div>`;
+                editQuestionsContainer.appendChild(qDiv);
+            });
+        }
+
+        function applyToPreview() {
+            const newQuestions = [];
+            editQuestionsContainer.querySelectorAll('.border').forEach((div, idx) => {
+                const qText = div.querySelector('textarea').value;
+                const opts = [];
+                const ans = [];
+                for(let i=0; i<4; i++){
+                    const optVal = document.getElementById(`opt-${idx}-${i}`)?.value;
+                    if(optVal) {
+                        opts.push(optVal);
+                        if(document.getElementById(`check-${idx}-${i}`).checked) ans.push(optVal);
+                    }
+                }
+                newQuestions.push({ number: idx+1, type: 'mcq', question: {en: qText}, options: {en: opts}, answer: {en: ans}});
+            });
+            const datasets = [quizDataPart1, quizDataPart2, quizDataPart3, quizDataPart4, quizDataPart5, quizDataPart6, quizDataPart7, quizDataPart8];
+            datasets[currentPart-1] = newQuestions;
+            quizData = newQuestions;
+            toggleEditMode();
+            initializeQuiz();
+        }
+
+        function generateSaveCode() {
+            const varName = `quizDataPart${currentPart}`;
+            exportOutput.value = `let ${varName} = ${JSON.stringify(quizData, null, 4)};`;
+            exportArea.classList.remove('hidden');
+        }
+
+        // Event Listeners
+        partButtons.forEach((btn, idx) => btn.addEventListener('click', () => switchPart(idx + 1)));
+        practiceSheetBtn.addEventListener('click', togglePracticeSheetView);
+        showAllBtn.addEventListener('click', toggleAllQuestionsView);
+        prevBtn.addEventListener('click', () => {
+            if (quizState[currentPart].currentQuestionIndex > 0) {
+                quizState[currentPart].currentQuestionIndex--;
+                showQuestion();
+            }
+        });
+        nextBtn.addEventListener('click', () => {
+            const allAnswered = quizState[currentPart].userAnswers.filter(Boolean).length === quizData.length;
+            if (quizState[currentPart].currentQuestionIndex < quizData.length - 1 && !allAnswered) {
+                quizState[currentPart].currentQuestionIndex++;
+                showQuestion();
+            } else showResults();
+        });
+        restartBtn.addEventListener('click', initializeQuiz);
+        redoBtn.addEventListener('click', redoQuestion);
+        redoPartBtn.addEventListener('click', redoPart);
+        editQuizBtn.addEventListener('click', toggleEditMode);
+        applyPreviewBtn.addEventListener('click', applyToPreview);
+        generateSaveCodeBtn.addEventListener('click', generateSaveCode);
+        cancelEditBtn.addEventListener('click', toggleEditMode);
+        exportOutput.addEventListener('click', () => {
+            exportOutput.select();
+            document.execCommand('copy');
+            copyFeedbackEl.textContent = 'Code copied!';
+            setTimeout(() => { copyFeedbackEl.textContent = '' }, 2000);
+        });
+
+        initializeQuiz();
+    </script>
+</body>
+</html>
+```
